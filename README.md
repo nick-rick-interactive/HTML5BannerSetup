@@ -1,27 +1,27 @@
 # HTML5 Banner Setup<br/>
 
-#### This repository will get you up and running with a basic layout for a DoubleClick banner set.
+#### This repository will get you up and running with a basic layout for a <a href="https://www.doubleclickbygoogle.com/" target="_blank">DoubleClick</a> banner set.
 ###### It utilizes Gulp to create banner sets from a template, copy existing completed banners to a new size, and compiling.
 
-You must install NPM to generate banners<br/><br/>
+You must install <a href="https://www.npmjs.com" target="_blank">NPM</a> to generate banners<br/><br/>
 
 ### Start by installing the Node Modules needed
 
     npm install
 
-### Jade<br/>
+### <a href="http://sass-lang.com/" target="_blank">Jade</a><br/>
 
 The html for the banners is generated with Jade mark up.
 
-### Coffeescript<br/>
+### <a href="http://coffeescript.org/" target="_blank">Coffeescript</a><br/>
 
 The javascript is generated using coffeescript.  A basic banner class utilizing polite load is added to the project to extend into the Banner's class.
 
-### SASS<br/>
+### <a href="http://sass-lang.com//" target="_blank">SASS</a><br/>
 
 Sass is used for all css.  A mixin file and basic banner additional mixins are added to the project to get you started
 
-### Gulp<br/>
+### <a href="http://sass-lang.com//" target="_blank">Gulp</a><br/>
 
 Gulp is setup to use 3 main functions<br/><br/><br/>
 
