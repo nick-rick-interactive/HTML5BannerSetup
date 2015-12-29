@@ -3,7 +3,11 @@
 #### This repository will get you up and running with a basic layout for a DoubleClick banner set.
 ###### It utilizes Gulp to create banner sets from a template, copy existing completed banners to a new size, and compiling.
 
-You must install NPM and GULP to generate banners<br/><br/>
+You must install NPM to generate banners<br/><br/>
+
+### Start by installing the Node Modules needed
+
+    npm install
 
 ### Jade<br/>
 
