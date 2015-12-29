@@ -1,0 +1,43 @@
+@import "css3";
+
+@mixin container($width:auto, $height:auto, $border: 1px solid black){
+  position: relative;
+  display: inline-block;
+  width: $width;
+  height: $height;
+  border: $border;
+  overflow: hidden;
+}
+
+@mixin graphic($width: auto, $height:auto, $top: 0, $left: 0) {
+  position: absolute;
+  display: inline-block;
+  @include box-sizing();
+  width: $width;
+  height: $height;
+  top: $top;
+  left: $left;
+  @include transform-origin(50% 50%);
+  @include transform-style();
+}
+
+@mixin banner-img($url) {
+  background: url($url) top left no-repeat;
+  @include background-size(cover);
+}
+
+@mixin overlay($width: auto, $height:auto) {
+  @include graphic($width, $height);
+  cursor: pointer;
+  z-index: 999;
+}
+
+@mixin cta($width: auto, $height:auto, $top: 0, $left: 0) {
+  @include graphic($width, $height, $top, $left);
+  cursor: pointer;
+  z-index: 9999;
+}
+
+.ani-elem{
+  @include opacity(0);
+}

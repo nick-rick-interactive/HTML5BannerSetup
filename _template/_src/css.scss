@@ -1,0 +1,35 @@
+@import "../../_src/sass/banner.scss";
+
+/// CHANGE SIZES
+$width:   auto;
+$height:  auto;
+
+*{
+  margin: 0;
+  padding: 0;
+  outline: none;
+}
+
+body{
+  background: gray;
+}
+
+#main{
+  @include container($width, $height);
+
+  #cta{
+    @include cta(200px,300px,30px,50px);
+  }
+
+  #overlay{
+    @include overlay($width, $height);
+  }
+
+  #bg{
+    @include graphic($width, $height);
+    @include banner-img("images/bg.jpg");
+    @include opacity(1);
+    z-index: 2;
+  }
+}
+

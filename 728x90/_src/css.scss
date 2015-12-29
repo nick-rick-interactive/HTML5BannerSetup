@@ -1,0 +1,64 @@
+@import "../../_src/sass/banner.scss";
+
+$width:   728px;
+$height:  90px;
+
+*{
+  margin: 0;
+  padding: 0;
+  outline: none;
+}
+
+body{
+  background: gray;
+}
+
+#main{
+  @include container($width, $height);
+
+  #cta{
+    @include cta(145px, 30px, 13px, 196px);
+  }
+
+  #overlay{
+    @include overlay($width, $height);
+  }
+
+  #bg{
+    @include graphic($width, $height);
+    @include banner-img("images/bg.jpg");
+    @include opacity(1);
+    z-index: 2;
+  }
+
+  #words{
+    @include graphic(auto,auto,13px,196px);
+    z-index: 3;
+
+    #clean{
+      @include graphic(91px,29px);
+      @include banner-img("images/clean.png");
+    }
+
+    #friendly{
+      @include graphic(131px,38px);
+      @include banner-img("images/friendly.png");
+    }
+
+    #fun{
+      @include graphic(60px,29px);
+      @include banner-img("images/fun.png");
+    }
+
+    #price{
+      @include graphic(101px,33px);
+      @include banner-img("images/price.png");
+    }
+
+    #start{
+      @include graphic(145px,25px,5px,0);
+      @include banner-img("images/to_start.png");
+    }
+  }
+}
+
