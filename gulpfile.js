@@ -22,6 +22,7 @@ var concat = require('gulp-concat');
 var jade = require('gulp-jade');
 var coffee = require('gulp-coffee');
 var sass = require('gulp-sass');
+var nano = require('gulp-cssnano');
 var imagemin = require('gulp-imagemin');
 var imageMinJpegTran = require('imagemin-jpegtran');
 var imageMinPngQuant = require('imagemin-pngquant');
@@ -115,6 +116,9 @@ gulp.task('sass', function () {
         .pipe(sass().on('error', sass.logError))
         .pipe(rename(filename+".css"))
         .pipe(gulp.dest(dirs.dist))
+        .pipe(nano())
+        .pipe(rename(filename+".min.css"))
+        .pipe(gulp.dest(dirs.dist))
         .pipe(reload({stream: true}));
 });
 
@@ -122,7 +126,8 @@ gulp.task('zip', function () {
     return gulp.src([
             dirs.dist + "/**/*",
             '!' + dirs.dist + "/" + filename + ".zip",
-            '!' + dirs.dist + "/" + filename + ".js"
+            '!' + dirs.dist + "/" + filename + ".js",
+            '!' + dirs.dist + "/" + filename + ".css"
         ])
         .pipe(zip(filename+'.zip'))
         .pipe(gulp.dest(dirs.dist))

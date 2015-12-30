@@ -19,11 +19,11 @@ The javascript is generated using coffeescript.  A basic banner class utilizing 
 
 ### <a href="http://sass-lang.com//" target="_blank">SASS</a><br/>
 
-Sass is used for all css.  A Cross Browser CSS3 mixin file (<a href="https://github.com/matthieua/sass-css3-mixins" target="_blank">>matthieua/sass-css3-mixins</a>) and basic banner additional mixins are added to the project to get you started
+Sass is used for all css.  A Cross Browser CSS3 mixin file (<a href="https://github.com/matthieua/sass-css3-mixins" target="_blank">matthieua/sass-css3-mixins</a>) and basic banner additional mixins are added to the project to get you started
 
 ### <a href="http://sass-lang.com//" target="_blank">Gulp</a><br/>
 
-Gulp is setup to use 3 main functions<br/><br/><br/>
+Gulp is setup to use 3 main functions<br/><br/>
 
 ##### new-banner<br/>
 This will generate the template files needed to create a banner.  Use the "size" argument to send the folder naming convention.
