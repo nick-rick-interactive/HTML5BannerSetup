@@ -17,6 +17,7 @@ var runSequence = require('run-sequence');
 
 var rename = require('gulp-rename');
 var concat = require('gulp-concat');
+var del = require('del');
 
 // COMPILING
 var jade = require('gulp-jade');
@@ -50,9 +51,9 @@ var reload      = browserSync.reload;
 // ---------------------------------------------------------------------
 
 var src = {
-    jade: dirs.src+'/*.jade',
-    coffee: dirs.src + '/js.coffee',
-    sass: dirs.src + '/css.scss',
+    jade: dirs.src+'/'+filename+'.jade',
+    coffee: dirs.src + '/'+filename+'.coffee',
+    sass: dirs.src + '/'+filename+'.scss',
     img: filename + "/_img/**"
 }
 
@@ -62,7 +63,7 @@ var src = {
 // ---------------------------------------------------------------------
 
 gulp.task('clean', function (done) {
-    require('del')([
+    del([
         dirs.dist
     ], done);
 });
@@ -168,17 +169,64 @@ gulp.task('build', function (done) {
         done);
 });
 
-gulp.task('copy-banner', function () {
+
+// COPY BANNER
+gulp.task('copy-banner', function (done) {
+    runSequence(
+        "cb-move-files",
+        "cb-rename",
+        "cb-remove-temp",
+        done);
+});
+
+gulp.task('cb-move-files', function () {
     return gulp.src([
         filename + "/**/*",
-        "!" + filename + "/dist/**/*"
+        "!" + filename + "/dist/*"
     ])
         .pipe(gulp.dest(argv.newSize))
 });
 
-gulp.task('new-banner', function () {
+gulp.task('cb-rename', function () {
+    return gulp.src(argv.newSize+"/_src/**/*")
+        .pipe(rename(function(path){
+            path.basename = argv.newSize
+        }))
+        .pipe(gulp.dest(argv.newSize+"/_src/"))
+});
+
+gulp.task('cb-remove-temp', function () {
+    return del([
+            argv.newSize+"/_src/"+filename+".*"
+    ])
+});
+
+
+// NEW BANNER
+
+gulp.task('new-banner', function (done) {
+    runSequence(
+        "nb-move-files",
+        "nb-rename",
+        "nb-remove-temp",
+        done);
+});
+
+gulp.task('nb-move-files', function () {
     return gulp.src("_template/**/*")
         .pipe(gulp.dest(filename))
+});
+
+gulp.task('nb-rename', function () {
+    return gulp.src(filename+"/_src/**/*")
+        .pipe(rename(function(path){
+            path.basename = filename
+        }))
+        .pipe(gulp.dest(filename+"/_src"))
+});
+
+gulp.task('nb-remove-temp', function () {
+    return del(filename+"/_src/template.*")
 });
 
 
