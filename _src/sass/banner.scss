@@ -1,6 +1,6 @@
 @import "css3";
 
-@mixin container($width:auto, $height:auto, $border: 1px solid black){
+@mixin container($width:auto, $height:auto, $top: 0, $left: 0, $border: 1px solid black){
   position: relative;
   display: inline-block;
   width: $width;

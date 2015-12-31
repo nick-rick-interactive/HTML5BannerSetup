@@ -1,8 +1,11 @@
 @import "../../_src/sass/banner.scss";
 
-/// CHANGE SIZES
-$width:   auto;
-$height:  auto;
+
+/// _PREFIX___WIDTH_x_HEIGHT_
+
+
+$width:   _WIDTH_px;
+$height:  _HEIGHT_px;
 
 *{
   margin: 0;
@@ -18,7 +21,7 @@ body{
   @include container($width, $height);
 
   #cta{
-    @include cta(200px,300px,30px,50px);
+    @include cta(200px,100px,$width - 220px,$height - 120px);
   }
 
   #overlay{

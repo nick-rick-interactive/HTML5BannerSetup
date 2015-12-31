@@ -1,0 +1,70 @@
+@import "../../_src/sass/banner.scss";
+
+
+/// _PREFIX___WIDTH_x_HEIGHT__exp__EXP_W_x_EXP_H_
+
+
+$width:   _WIDTH_px;
+$height:  _HEIGHT_px;
+
+$exp-width:  _EXP_W_px;
+$exp-height:  _EXP_H_px;
+$exp-offset-x:  _OFFSET_X_px;
+$exp-offset-y:  _OFFSET_Y_px;
+
+*{
+  margin: 0;
+  padding: 0;
+  outline: none;
+}
+
+body{
+  background: gray;
+}
+
+#main{
+  @include container($exp-width, $exp-height, $exp-offset-y, $exp-offset-x);
+
+  #collapsed-panel{
+    @include container($width, $height);
+    position: absolute;
+    z-index: 2;
+
+    #cta{
+      @include cta(200px,100px,$width - 220px,$height - 120px);
+    }
+
+    #overlay{
+      @include overlay($width, $height);
+    }
+
+    #bg{
+      @include graphic($width, $height);
+      @include banner-img("images/bg.jpg");
+      @include opacity(1);
+      z-index: 2;
+    }
+  }
+
+  #expanded-panel{
+    @include container($exp-width, $exp-height, $exp-offset-y, $exp-offset-x);
+    position: absolute;
+    z-index: 3;
+
+    #cta-exp{
+      @include cta(200px,100px,$exp-offset-y - 220px,$exp-offset-x - 120px);
+    }
+
+    #overlay-exp{
+      @include overlay($exp-width, $exp-height);
+    }
+
+    #bg-exp{
+      @include graphic($exp-width, $exp-height);
+      @include banner-img("images/exp-bg.jpg");
+      @include opacity(1);
+      z-index: 2;
+    }
+  }
+}
+
