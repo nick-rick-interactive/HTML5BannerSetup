@@ -1,6 +1,6 @@
 class _PREFIX___WIDTH_x_HEIGHT__exp__EXP_W_x_EXP_H_ extends Banner
 
-  /// COLLAPSED ///
+  /// FLOATING ///
 
   init: () =>
 
@@ -42,7 +42,7 @@ class _PREFIX___WIDTH_x_HEIGHT__exp__EXP_W_x_EXP_H_ extends Banner
       })
 
 
-  /// CLOSE FLOATING ///
+  /// CLOSE FLOATING / START COLLAPSED ///
 
   closeInit: () =>
 

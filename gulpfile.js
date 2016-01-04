@@ -140,8 +140,9 @@ gulp.task('zip', function () {
 
 gulp.task('serve', function () {
 
+    console.log(path.basename(path.dirname()));
     browserSync.init({
-        proxy: 'http://localhost:63342/Chuze/'+dirs.dist+'/'+filename+'.html'
+        proxy: 'http://localhost:63342/'+path.basename(__dirname)+'/'+dirs.dist+'/'+filename+'.html'
     });
 
     gulp.watch(src.coffee, ['coffee']);
@@ -163,10 +164,15 @@ gulp.task('serve', function () {
 
 /**
  * Compile and shrink a banner
- * --size = (banner size to compile) REQUIRED
+ *
+ * --banner (REQUIRED) = Banner to compile. Folder name
+ *
+ *   i.e. (--banner=Banner_728x90)
+ *
  **/
 
 gulp.task('build', function (done) {
+
     runSequence(
         'clean',
         'coffee',
@@ -231,16 +237,17 @@ gulp.task('cb-move-files', function () {
 
     return gulp.src([
             filename + "/**/*",
-            "!" + filename + "/dist/*"
+            "!" + filename + "/dist/**/*"
         ])
         .pipe(gulp.dest(newFilename))
 });
 
 gulp.task('cb-rename', function () {
-    return gulp.src(argv.newSize+"/_src/**/*")
+    var re = new RegExp(filename,"g");
+    return gulp.src(newFilename+"/_src/**/*")
         .pipe(replace({
             patterns: [
-                {match: /filename/g,replacement: newFilename}
+                {match: re,replacement: newFilename}
             ]
         }))
         .pipe(rename(function(path){
