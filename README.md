@@ -26,17 +26,48 @@ Sass is used for all css.  A Cross Browser CSS3 mixin file (<a href="https://git
 Gulp is setup to use 3 main functions<br/><br/>
 
 ##### new-banner<br/>
-This will generate the template files needed to create a banner.  Use the "size" argument to send the folder naming convention.
-
-    gulp new-banner --size=728x90
+This will generate the template files needed to create a banner.  Use the "banner" argument to send the folder naming convention.  Each variable for --banner needs to separated by a * in the following order:<br/>
     
-<br/>
+    (--banner)
+    Prefix          REQUIRED
+    Width           REQUIRED
+    Height          REQUIRED
+    Exp-Width       REQUIRED FOR EXPANDING AND FLOATING UNITS
+    Exp-Height      REQUIRED FOR EXPANDING AND FLOATING UNITS
+    Offset-X        OPTIONAL FOR EXPANDING UNITS
+    Offset-Y        OPTIONAL FOR EXPANDING UNITS
+    
+The code should look similar to the following:
+
+    gulp new-banner --banner=Banner*728*90
+
+Which will output the folder (Banner_728x90)
+    
+<br/><br/>
 This will generate the Jade, Coffeescript and SASS files to start your project
 
 ##### copy-banner<br/>
-This will copy the files from one banner to a new banner size
+This will copy the files from one banner to a new banner size.  Each variable for --banner and --newBanner needs to separated by a * in the following order:<br/>
+                         
+    (--banner)
+    Prefix          REQUIRED
+    Width           REQUIRED
+    Height          REQUIRED
+    Exp-Width       REQUIRED FOR EXPANDING AND FLOATING UNITS
+    Exp-Height      REQUIRED FOR EXPANDING AND FLOATING UNITS
+         
+    (--newBanner)
+    Prefix          REQUIRED
+    Width           REQUIRED
+    Height          REQUIRED
+    Exp-Width       REQUIRED FOR EXPANDING AND FLOATING UNITS
+    Exp-Height      REQUIRED FOR EXPANDING AND FLOATING UNITS
+    
+The code should look similar to the following:
 
-    gulp copy-banner --size=728x90 --newSize
+    gulp new-banner --banner=Banner*728*90 --newBanner=Banner*300*250
+
+Which will copy the folder (Banner_728x90) to the new folder (Banner_300x250) and rename all the files and sizes.
     
 <br/>
 A duplicate banner set will be generated in the new size and an empty dist folder
@@ -44,8 +75,9 @@ A duplicate banner set will be generated in the new size and an empty dist folde
 ##### build (Default)<br/>
 This will compile the Jade, Coffeescript and SASS files to a minified JS file, an normal JS file, a CSS file and HTML file using the banner size as the naming convention in the argument sent
 
-    gulp --size=728x90
+    gulp --banner=Banner_728x90
 or
-    gulp build --size=728x90
+    gulp build --banner=Banner_728x900
+    
 <br/>
 This will compile all the code in the 728x90 folder.  It will also compress all images added to _img and zip up the CSS, HTML, minified JS and all images into a zip archive.
