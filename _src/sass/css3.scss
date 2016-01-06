@@ -100,6 +100,17 @@
   background: rgba($color, $opacity);
 }
 
+/// Blur
+/// @param {Size} - Blur Pixels [0] - Width
+
+@mixin blur($px: 0) {
+  -webkit-filter: blur(#{$px}px) !important;
+  -ms-filter: blur(#{$px}px) !important;
+  -moz-filter: blur(#{$px}px) !important;
+  filter: url("data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\'><filter id=\'blur\'><feGaussianBlur stdDeviation=\'#{$px}\' /></filter></svg>#blur");
+  filter:progid:DXImageTransform.Microsoft.Blur(PixelRadius='#{$px}');
+}
+
 
 /// Border Radius
 /// @param {Size} $radius [5px] - Radius
@@ -300,6 +311,13 @@
   filter: progid:DXImageTransform.Microsoft.Matrix(
                   M11=#{$m11}, M12=#{$m12}, M21=#{$m21}, M22=#{$m22}, sizingMethod='auto expand');
   zoom: 1;
+}
+
+
+/// Scale
+
+@mixin scale($scale) {
+  @include transform(scale($scale));
 }
 
 

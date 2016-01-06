@@ -14,6 +14,9 @@ html(lang='en')
         script(src='http://zeptojs.com/zepto.min.js')
         script(src='https://cdnjs.cloudflare.com/ajax/libs/gsap/1.18.2/TweenMax.min.js')
 
+        script
+            | var clickTag = "";
+
     body
 
         #main
@@ -26,7 +29,7 @@ html(lang='en')
 
             #expanded-panel
 
-                #cta-exp
+                a#cta-exp(href='javascript:window.open(window.clickTag)')
                 #close-exp
                 #overlay-exp
                 #bg-exp

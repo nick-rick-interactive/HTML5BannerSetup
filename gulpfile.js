@@ -24,6 +24,7 @@ var jade = require('gulp-jade');
 var coffee = require('gulp-coffee');
 var sass = require('gulp-sass');
 var nano = require('gulp-cssnano');
+var prefix = require('gulp-autoprefixer');
 var imagemin = require('gulp-imagemin');
 var imageMinJpegTran = require('imagemin-jpegtran');
 var imageMinPngQuant = require('imagemin-pngquant');
@@ -119,6 +120,10 @@ gulp.task('coffee', function () {
 gulp.task('sass', function () {
     return gulp.src(src.sass)
         .pipe(sass().on('error', sass.logError))
+        .pipe(prefix({
+            browsers: ['last 2 versions'],
+            cascade: false
+        }))
         .pipe(rename(filename+".css"))
         .pipe(gulp.dest(dirs.dist))
         .pipe(nano())

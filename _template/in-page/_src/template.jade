@@ -14,12 +14,15 @@ html(lang='en')
         script(src='http://zeptojs.com/zepto.min.js')
         script(src='https://cdnjs.cloudflare.com/ajax/libs/gsap/1.18.2/TweenMax.min.js')
 
+        script
+            | var clickTag = "";
+
     body
 
         #main
 
-            #cta
-            #overlay
+            a#cta(href='javascript:window.open(window.clickTag)')
+            a#overlay(href='javascript:window.open(window.clickTag)')
             #bg
 
         script(src='_PREFIX___WIDTH_x_HEIGHT_.min.js')

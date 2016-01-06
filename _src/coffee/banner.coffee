@@ -7,11 +7,11 @@ class Banner
     @loop = _loop
     @curLoop = 1
 
-    /// STORE ELEMENTS THAT WILL BE ANIMATED ///
+    #/// STORE ELEMENTS THAT WILL BE ANIMATED ///
 
     @els = $("#main").find(".ani-elem");
 
-    /// ADD UI LISTENERS FOR EACH TYPE ///
+    #/// ADD UI LISTENERS FOR EACH TYPE ///
 
     switch @type
 
@@ -38,7 +38,7 @@ class Banner
         $("#cta-float").bind("click",@exit);
         $("#close-float").bind("click",@close);
 
-    /// ADD DOUBLECLICK LISTENERS ///
+    #/// ADD DOUBLECLICK LISTENERS ///
 
     if @type != "in-page"
 
@@ -57,7 +57,7 @@ class Banner
 
   enablerInitHandler: (e) =>
 
-    /// CHECK PAGE IS LOADED ///
+    #/// CHECK PAGE IS LOADED ///
 
     if (Enabler.isPageLoaded())
 
@@ -69,7 +69,7 @@ class Banner
 
   checkVisible: (e) =>
 
-    /// CHECK PAGE IS VISIBLE ///
+    #/// CHECK PAGE IS VISIBLE ///
 
     if (Enabler.isVisible())
 
@@ -81,33 +81,33 @@ class Banner
 
 
 
-  /// OVERWRITE FUNCTION (REQUIRED) ///
+  #/// OVERWRITE FUNCTION (REQUIRED) ///
 
   init: (e) =>
 
     alert "you must add an init function to the extended coffeescript class"
 
-  /// OVERWRITE FUNCTION (REQUIRED) ///
+  #/// OVERWRITE FUNCTION (REQUIRED) ///
 
   expandInit: () =>
 
     alert "you must add an expand init function to the extended coffeescript class"
 
-  /// OVERWRITE FUNCTION (REQUIRED) ///
+  #/// OVERWRITE FUNCTION (REQUIRED) ///
 
   closeInit: () =>
 
     alert "you must add an close init function to the extended coffeescript class"
 
 
-  /// OVERWRITE FUNCTION ///
+  #/// OVERWRITE FUNCTION ///
 
   expandStartHandler: (e) =>
 
     Enabler.finishExpand();
 
 
-  /// OVERWRITE FUNCTION ///
+  #/// OVERWRITE FUNCTION ///
 
   expandFinishHandler: (e) =>
 
@@ -116,14 +116,14 @@ class Banner
     @expandInit();
 
 
-  /// OVERWRITE FUNCTION ///
+  #/// OVERWRITE FUNCTION ///
 
   collapseStartHandler: (e) =>
 
     Enabler.finishCollapse();
 
 
-  /// OVERWRITE FUNCTION ///
+  #/// OVERWRITE FUNCTION ///
 
   collapseFinishHandler: (e) =>
 
@@ -131,9 +131,9 @@ class Banner
 
 
 
-  /// BASE CLASS FUNCTIONS ///
+  #/// BASE CLASS FUNCTIONS ///
 
-  end: (_func, _dur) =>
+  end: (_func, _dur, _excludeStyleRemovalList = []) =>
 
     if @curLoop == @loop
 
@@ -142,7 +142,7 @@ class Banner
     else
 
       @curLoop++;
-      @replay(_func, _dur);
+      @replay(_func, _dur, _excludeStyleRemovalList);
 
   exit: (e) =>
 
@@ -152,14 +152,16 @@ class Banner
 
     Enabler.exit("exit")
 
-  replay: (_func, _dur) =>
+  replay: (_func, _dur, _excludeStyleRemovalList) =>
 
-    $(el)[0].removeAttribute("style") for el in @els
+    for el in @els when $.inArray($(el).attr("id"),_excludeStyleRemovalList) > -1
+
+      $(el).removeAttr("style")
 
     @switchFunc(_func, _dur)
 
 
-  /// UTILITY CLASS FUNCTIONS ///
+  #/// UTILITY CLASS FUNCTIONS ///
 
   toggleExpand: =>
 

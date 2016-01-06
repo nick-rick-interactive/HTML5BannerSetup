@@ -13,19 +13,22 @@ html(lang='en')
         script(src='http://zeptojs.com/zepto.min.js')
         script(src='https://cdnjs.cloudflare.com/ajax/libs/gsap/1.18.2/TweenMax.min.js')
 
+        script
+            | var clickTag = "";
+
     body
 
         #main
 
             #collapsed-panel
 
-                #cta
-                #overlay
+                a#cta(href='javascript:window.open(window.clickTag)')
+                a#overlay(href='javascript:window.open(window.clickTag)')
                 #bg
 
             #floating-panel
 
-                #cta-float
+                a#cta-float(href='javascript:window.open(window.clickTag)')
                 #close-float
                 #overlay-float
                 #bg-float
