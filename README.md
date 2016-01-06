@@ -73,11 +73,21 @@ Which will copy the folder (Banner_728x90) to the new folder (Banner_300x250) an
 A duplicate banner set will be generated in the new size and an empty dist folder
 
 ##### build (Default)<br/>
-This will compile the Jade, Coffeescript and SASS files to a minified JS file, an normal JS file, a CSS file and HTML file using the banner size as the naming convention in the argument sent
+This will compile the Jade, Coffeescript and SASS files to a minified JS file, an normal JS file, a CSS file and HTML file using the banner size as the naming convention in the argument sent.  It will then package the distrbution files into a zip in the dist folder and a "zipped" folder in the main directory.
 
     gulp --banner=Banner_728x90
+    
 or
+
     gulp build --banner=Banner_728x900
     
 <br/>
 This will compile all the code in the 728x90 folder.  It will also compress all images added to _img and zip up the CSS, HTML, minified JS and all images into a zip archive.
+
+##### package<br/>
+This compile, shrink and zip all units with the given prefix argument
+
+    gulp package --prefix=Banner
+    
+<br/>
+This will compile (build) all the code in any folder that has the prefix of "Banner".
