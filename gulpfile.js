@@ -18,6 +18,7 @@ var rename = require('gulp-rename');
 var replace = require('gulp-replace-task');
 var concat = require('gulp-concat');
 var del = require('del');
+var tap = require('gulp-tap');
 
 // COMPILING
 var jade = require('gulp-jade');
@@ -55,6 +56,8 @@ var reload      = browserSync.reload;
 // | SRC FILES                                                         |
 // ---------------------------------------------------------------------
 
+var directories;
+var taskCount;
 var src = {
     jade: dirs.src+'/'+filename+'.jade',
     coffee: dirs.src + '/'+filename+'.coffee',
@@ -118,8 +121,11 @@ gulp.task('coffee', function () {
 });
 
 gulp.task('sass', function () {
+    console.log(dirs.dist+" "+src.sass)
     return gulp.src(src.sass)
-        .pipe(sass().on('error', sass.logError))
+        .pipe(sass({
+            errLogToConsole: true
+        }).on('error', sass.logError))
         .pipe(prefix({
             browsers: ['last 2 versions'],
             cascade: false
@@ -141,6 +147,7 @@ gulp.task('zip', function () {
         ])
         .pipe(zip(filename+'.zip'))
         .pipe(gulp.dest(dirs.dist))
+        .pipe(gulp.dest("zipped"))
 });
 
 gulp.task('serve', function () {
@@ -168,7 +175,7 @@ gulp.task('serve', function () {
 // MAIN FUNCTIONS
 
 /**
- * Compile and shrink a banner
+ * Compile and shrink a banner then see on Browser Sync
  *
  * --banner (REQUIRED) = Banner to compile. Folder name
  *
@@ -188,6 +195,65 @@ gulp.task('build', function (done) {
         'serve',
         done);
 });
+
+
+// MAIN FUNCTIONS
+
+/**
+ * Compile, shrink and package all banners
+ *
+ * --prefix (REQUIRED) = Prefix for all banners to be compiled
+ *
+ *   i.e. (--prefix=Banner)
+ *
+ **/
+
+gulp.task('package', function () {
+
+    taskCount = 0;
+    directories = [];
+
+    function runTasks(){
+        taskCount++;
+        if(taskCount!=directories.length+1){
+
+            filename = directories[taskCount-1];
+            console.log("Packaging "+directories[taskCount-1]);
+
+            dirs.src = filename + "/_src";
+            dirs.dist = filename + "/dist";
+
+            src = {
+                jade: dirs.src+'/'+filename+'.jade',
+                coffee: dirs.src + '/'+filename+'.coffee',
+                sass: dirs.src + '/'+filename+'.scss',
+                img: filename + "/_img/**"
+            }
+
+
+            runSequence(
+                'clean',
+                'coffee',
+                'sass',
+                'copy',
+                'jade',
+                'zip',
+                runTasks);
+        }
+    }
+
+    runSequence(
+        'getDirectories',
+        runTasks
+    )
+});
+
+gulp.task('getDirectories',function(){
+    return gulp.src(argv.prefix+"_*")
+        .pipe(tap(function(file,t){
+            directories.push(path.basename((file.path)))
+        }));
+})
 
 
 // COPY BANNER
