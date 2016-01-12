@@ -51,6 +51,10 @@ dirs.dist = filename + "/" + dirs.dist;
 var browserSync = require('browser-sync').create();
 var reload      = browserSync.reload;
 
+//GIT RELEASE
+var git = require('gulp-git');
+var excludeGitignore = require('gulp-exclude-gitignore');
+
 
 // ---------------------------------------------------------------------
 // | SRC FILES                                                         |
@@ -401,5 +405,12 @@ gulp.task('nb-remove-temp', function () {
     return del(filename+"/_src/template.*")
 });
 
+
+gulp.task('deploy', function() {
+    return gulp.src('./*')
+        .pipe(excludeGitignore())
+        .pipe(git.commit('gulp auto commit'))
+        .pipe(git.push('origin', 'master'));
+});
 
 gulp.task('default', ['build']);
