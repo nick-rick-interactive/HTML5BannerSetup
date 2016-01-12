@@ -406,12 +406,19 @@ gulp.task('nb-remove-temp', function () {
 });
 
 
-gulp.task('deploy', function() {
+gulp.task('deploy', function(done) {
+    runSequence(
+        "git-commit",
+        "git-push",
+        done);
+});
+gulp.task('git-commit', function() {
     return gulp.src('./*')
         .pipe(excludeGitignore())
-        .pipe(git.commit('gulp auto commit'))
-        .pipe(git.push('origin', 'master'))
-        .pipe(gulp.dest("./"));
+        .pipe(git.commit('gulp auto commit'));
+});
+gulp.task('git-push', function() {
+    git.push('origin', 'master')
 });
 
 gulp.task('default', ['build']);
