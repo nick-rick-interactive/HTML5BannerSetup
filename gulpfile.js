@@ -410,7 +410,8 @@ gulp.task('deploy', function() {
     return gulp.src('./*')
         .pipe(excludeGitignore())
         .pipe(git.commit('gulp auto commit'))
-        .pipe(git.push('origin', 'master'));
+        .pipe(git.push('origin', 'master'))
+        .pipe(gulp.dest("./"));
 });
 
 gulp.task('default', ['build']);
