@@ -24,11 +24,13 @@ var tap = require('gulp-tap');
 var jade = require('gulp-jade');
 var coffee = require('gulp-coffee');
 var sass = require('gulp-sass');
+//var compass = require('gulp-compass');
 var nano = require('gulp-cssnano');
 var prefix = require('gulp-autoprefixer');
 var imagemin = require('gulp-imagemin');
 var imageMinJpegTran = require('imagemin-jpegtran');
 var imageMinPngQuant = require('imagemin-pngquant');
+
 
 // ZIP UP DIST
 var zip = require('gulp-zip');
@@ -50,6 +52,7 @@ dirs.dist = filename + "/" + dirs.dist;
 
 var browserSync = require('browser-sync').create();
 var reload      = browserSync.reload;
+
 
 //GIT RELEASE
 var git = require('gulp-git');
@@ -93,7 +96,7 @@ gulp.task('copy:images', function () {
                 imageMinPngQuant({quality: '65-80', speed: 4})
             ]
         }))
-        .pipe(gulp.dest(dirs.dist + "/images"))
+        .pipe(gulp.dest(dirs.dist + ""))
         .pipe(reload({stream: true}));
 });
 
@@ -125,14 +128,26 @@ gulp.task('coffee', function () {
 });
 
 gulp.task('sass', function () {
-    console.log(dirs.dist+" "+src.sass)
+    var img1 = new RegExp("images/","g");
+    var img2 = new RegExp("_img/","g");
     return gulp.src(src.sass)
         .pipe(sass({
             errLogToConsole: true
         }).on('error', sass.logError))
+        /*.pipe(compass({
+         css: dirs.dist,
+         sass: dirs.dist,
+         image: dirs.dist+'/images'
+         })*/
         .pipe(prefix({
             browsers: ['last 2 versions'],
             cascade: false
+        }))
+        .pipe(replace({
+            patterns: [
+                {match: img1,replacement: ""},
+                {match: img2,replacement: ""}
+            ]
         }))
         .pipe(rename(filename+".css"))
         .pipe(gulp.dest(dirs.dist))
@@ -420,5 +435,6 @@ gulp.task('git-commit', function() {
 gulp.task('git-push', function() {
     git.push('origin', 'master')
 });
+
 
 gulp.task('default', ['build']);
