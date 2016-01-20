@@ -258,6 +258,10 @@ gulp.task('package', function () {
                 'jade',
                 'zip',
                 runTasks);
+        }else{
+            runSequence(
+                'zipAll'
+            )
         }
     }
 
@@ -272,6 +276,13 @@ gulp.task('getDirectories',function(){
         .pipe(tap(function(file,t){
             directories.push(path.basename((file.path)))
         }));
+})
+
+gulp.task('zipAll',function(){
+    console.log('zipping all');
+    return gulp.src("./zipped/*")
+        .pipe(zip("./"+argv.prefix+'.zip'))
+        .pipe(gulp.dest("./"))
 })
 
 
