@@ -49,7 +49,7 @@ class Banner
 
     if (Enabler.isInitialized())
 
-      Banner.enablerInitHandler();
+      @enablerInitHandler();
 
     else
 
@@ -61,7 +61,7 @@ class Banner
 
     if (Enabler.isPageLoaded())
 
-      Banner.checkVisible();
+      @checkVisible();
 
     else
 
@@ -73,7 +73,7 @@ class Banner
 
     if (Enabler.isVisible())
 
-      Banner.init();
+      @init();
 
     else
 
