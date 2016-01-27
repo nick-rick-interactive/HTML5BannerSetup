@@ -1,0 +1,27 @@
+doctype html
+
+html(lang='en')
+
+    head
+
+        meta(charset='UTF-8')
+        meta(name="ad.size",content="width=_WIDTH_,height=_HEIGHT_")
+
+        title= "_PREFIX_ - _WIDTH_x_HEIGHT_"
+
+        link(href = '_PREFIX___WIDTH_x_HEIGHT_.min.css', rel = 'stylesheet')/
+
+        script(src='https://tpc.googlesyndication.com/pagead/gadgets/html5/api/exitapi.js')
+        script(src='https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js')
+        script(src='https://s0.2mdn.net/ads/studio/cached_libs/tweenmax_1.18.0_499ba64a23378545748ff12d372e59e9_min.js')
+        script(src='https://s0.2mdn.net/ads/studio/cached_libs/easeljs_0.8.1_58add2e69ca7fbe25e8f82a2b5f6a510_min.js')
+
+    body
+
+        #main
+
+            a#cta(href='javascript:ExitApi.exit()')
+            a#overlay(href='javascript:ExitApi.exit()')
+            #bg
+
+        script(src='_PREFIX___WIDTH_x_HEIGHT_.min.js')

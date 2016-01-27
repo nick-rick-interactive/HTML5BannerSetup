@@ -1,0 +1,11 @@
+{
+  "prefix":"Test",
+  "width":728,
+  "height":90,
+  "exp_width":728,
+  "exp_height":90100,
+  "offset-x":0,
+  "offset-y":0,
+  "lang":"canvas",
+  "type":"in-page"
+}

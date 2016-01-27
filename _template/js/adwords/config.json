@@ -1,0 +1,11 @@
+{
+  "prefix":_PREFIX_,
+  "width":_WIDTH_,
+  "height":_HEIGHT_,
+  "exp_width":_EXP_W_,
+  "exp_height":_EXP_H_,
+  "offset-x":_OFFSET-X_,
+  "offset-y":_OFFSET-Y_,
+  "lang":_LANG_,
+  "type":_TYPE_
+}

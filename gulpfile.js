@@ -43,6 +43,7 @@ var filename = (argv.banner) ? argv.banner : "Banner_728x90";
 var newVals = ["Banner",728,90];
 var newFilename = (argv.newBanner) ? argv.newBanner : "Banner_728x90";
 var bannerType = "in-page";
+var bannerLang = "js";
 
 var dirs = pkg['configs'].directories;
 
@@ -69,8 +70,10 @@ var src = {
     jade: dirs.src+'/'+filename+'.jade',
     coffee: dirs.src + '/'+filename+'.coffee',
     sass: dirs.src + '/'+filename+'.scss',
+    config: dirs.src + '/'+filename+'.json',
     img: filename + "/_img/**"
 }
+var config;
 
 
 // ---------------------------------------------------------------------
@@ -104,17 +107,32 @@ gulp.task('jade', function () {
     var YOUR_LOCALS = {
         size: filename
     };
+    var img1 = new RegExp("images/","g");
+    var img2 = new RegExp("_img/","g");
 
     return gulp.src(src.jade)
         .pipe(jade({locals: YOUR_LOCALS,pretty:true}))
+        .pipe(replace({
+            patterns: [
+                {match: img1,replacement: ""},
+                {match: img2,replacement: ""}
+            ]
+        }))
         .pipe(rename(filename+'.html'))
         .pipe(gulp.dest(dirs.dist))
         .pipe(reload({stream: true}));
 });
 
 gulp.task('coffee', function () {
+    config = require("./"+src.config);
+    var bannerClass;
+    if(config['type']=="adwords"){
+        bannerClass = (config['lang']=="js") ? "banner_aw" : "banner_aw_canvas";
+    }else{
+        bannerClass = (config['lang']=="js") ? "banner" : "banner_canvas";
+    }
     return gulp.src([
-            "_src/coffee/**",
+            "_src/coffee/"+bannerClass+".coffee",
             src.coffee
         ])
         .pipe(concat("concat.coffee"))
@@ -332,6 +350,7 @@ gulp.task('cb-move-files', function () {
     newVals[6] = newVals[6] ? newVals[6] : "0"; // FOR EXPANDING UNITS
 
     bannerType = (argv.type) ? argv.type : bannerType;
+    bannerLang = (argv.lang) ? argv.lang : bannerLang;
 
     filename = (bannerType=="in-page") ? vals[0]+"_"+vals[1]+"x"+vals[2] : vals[0]+"_"+vals[1]+"x"+vals[2]+"_exp_"+vals[3]+"x"+vals[4];
     newFilename = (bannerType=="in-page") ?  newVals[0]+"_"+newVals[1]+"x"+newVals[2] : newVals[0]+"_"+newVals[1]+"x"+newVals[2]+"_exp_"+newVals[3]+"x"+newVals[4];
@@ -380,7 +399,7 @@ gulp.task('cb-remove-temp', function () {
  *
  *      i.e. (--banner=Banner*728*90*728*200*0*0)
  *
- * --type (REQUIRED) = in-page, expandable or floating [DEFAULT = in-page]
+ * --type (REQUIRED) = adwords, in-page, expandable or floating [DEFAULT = in-page]
  *
  **/
 
@@ -401,10 +420,11 @@ gulp.task('nb-move-files', function () {
     vals[6] = vals[6] ? vals[6] : "0"; // FOR EXPANDING UNITS
 
     bannerType = (argv.type) ? argv.type : bannerType;
+    bannerLang = (argv.lang) ? argv.lang : bannerLang;
 
     filename = (bannerType=="in-page") ? vals[0]+"_"+vals[1]+"x"+vals[2] : vals[0]+"_"+vals[1]+"x"+vals[2]+"_exp_"+vals[3]+"x"+vals[4];
 
-    return gulp.src("_template/"+bannerType+"/**/*")
+    return gulp.src("_template/"+bannerLang+"/"+bannerType+"/**/*")
         .pipe(gulp.dest(filename))
 });
 
@@ -418,7 +438,9 @@ gulp.task('nb-rename', function () {
                 {match: /_EXP_W_/g,replacement: vals[3]},
                 {match: /_EXP_H_/g,replacement: vals[4]},
                 {match: /_OFFSET-X_/g,replacement: vals[5]},
-                {match: /_OFFSET-Y_/g,replacement: vals[6]}
+                {match: /_OFFSET-Y_/g,replacement: vals[6]},
+                {match: /_TYPE_/g,replacement: bannerType},
+                {match: /_LANG_/g,replacement: bannerLang}
             ]
         }))
         .pipe(rename(function(path){
