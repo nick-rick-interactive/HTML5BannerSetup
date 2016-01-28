@@ -1,6 +1,7 @@
 {
   "devDependencies": {
     "apache-server-configs": "2.14.0",
+    "beepbeep": "^1.2.0",
     "browser-sync": "^2.8.2",
     "del": "^1.1.1",
     "git-push": "^0.1.1",
@@ -19,6 +20,7 @@
     "gulp-imagemin": "^2.4.0",
     "gulp-jade": "^1",
     "gulp-load-plugins": "^0.10.0",
+    "gulp-plumber": "^1.0.1",
     "gulp-rename": "^1.2.0",
     "gulp-replace-task": "^0.11.0",
     "gulp-sass": "^2",

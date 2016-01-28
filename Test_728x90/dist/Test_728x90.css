@@ -143,14 +143,14 @@ body {
     -khtml-transform: scale(1.2);
     transform: scale(1.2);
     z-index: 70; }
-  #elements #scene_1 {
+  #elements #scene_1_mask {
     position: absolute;
     display: inline-block;
     -khtml-box-sizing: border-box;
     -ms-box-sizing: border-box;
     -o-box-sizing: border-box;
     box-sizing: border-box;
-    width: 0;
+    width: 728px;
     height: 90px;
     top: 0;
     left: 0;
@@ -162,7 +162,33 @@ body {
     -ms-transform-style: preserve-3d;
     -o-transform-style: preserve-3d;
     transform-style: preserve-3d;
-    overflow-x: hidden;
+    filter: alpha(opacity=0);
+    -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=0)";
+    -webkit-opacity: 0;
+    -khtml-opacity: 0;
+    -moz-opacity: 0;
+    -ms-opacity: 0;
+    -o-opacity: 0;
+    opacity: 0; }
+  #elements #scene_1 {
+    position: absolute;
+    display: inline-block;
+    -khtml-box-sizing: border-box;
+    -ms-box-sizing: border-box;
+    -o-box-sizing: border-box;
+    box-sizing: border-box;
+    width: 728px;
+    height: 90px;
+    top: 0;
+    left: 0;
+    -webkit-transform-origin: 50% 50%;
+    -khtml-transform-origin: 50% 50%;
+    transform-origin: 50% 50%;
+    -webkit-transform-style: preserve-3d;
+    -khtml-transform-style: preserve-3d;
+    -ms-transform-style: preserve-3d;
+    -o-transform-style: preserve-3d;
+    transform-style: preserve-3d;
     z-index: 10; }
     #elements #scene_1 #txt_1 {
       position: absolute;
@@ -183,14 +209,14 @@ body {
       -ms-transform-style: preserve-3d;
       -o-transform-style: preserve-3d;
       transform-style: preserve-3d; }
-  #elements #scene_2 {
+  #elements #scene_2_mask {
     position: absolute;
     display: inline-block;
     -khtml-box-sizing: border-box;
     -ms-box-sizing: border-box;
     -o-box-sizing: border-box;
     box-sizing: border-box;
-    width: 0;
+    width: 728px;
     height: 90px;
     top: 0;
     left: 0;
@@ -202,7 +228,33 @@ body {
     -ms-transform-style: preserve-3d;
     -o-transform-style: preserve-3d;
     transform-style: preserve-3d;
-    overflow-x: hidden;
+    filter: alpha(opacity=0);
+    -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=0)";
+    -webkit-opacity: 0;
+    -khtml-opacity: 0;
+    -moz-opacity: 0;
+    -ms-opacity: 0;
+    -o-opacity: 0;
+    opacity: 0; }
+  #elements #scene_2 {
+    position: absolute;
+    display: inline-block;
+    -khtml-box-sizing: border-box;
+    -ms-box-sizing: border-box;
+    -o-box-sizing: border-box;
+    box-sizing: border-box;
+    width: 728px;
+    height: 90px;
+    top: 0;
+    left: 0;
+    -webkit-transform-origin: 50% 50%;
+    -khtml-transform-origin: 50% 50%;
+    transform-origin: 50% 50%;
+    -webkit-transform-style: preserve-3d;
+    -khtml-transform-style: preserve-3d;
+    -ms-transform-style: preserve-3d;
+    -o-transform-style: preserve-3d;
+    transform-style: preserve-3d;
     z-index: 20; }
     #elements #scene_2 #txt_2 {
       position: absolute;
@@ -223,14 +275,14 @@ body {
       -ms-transform-style: preserve-3d;
       -o-transform-style: preserve-3d;
       transform-style: preserve-3d; }
-  #elements #scene_3 {
+  #elements #scene_3_mask {
     position: absolute;
     display: inline-block;
     -khtml-box-sizing: border-box;
     -ms-box-sizing: border-box;
     -o-box-sizing: border-box;
     box-sizing: border-box;
-    width: 0;
+    width: 728px;
     height: 90px;
     top: 0;
     left: 0;
@@ -242,7 +294,33 @@ body {
     -ms-transform-style: preserve-3d;
     -o-transform-style: preserve-3d;
     transform-style: preserve-3d;
-    overflow-x: hidden;
+    filter: alpha(opacity=0);
+    -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=0)";
+    -webkit-opacity: 0;
+    -khtml-opacity: 0;
+    -moz-opacity: 0;
+    -ms-opacity: 0;
+    -o-opacity: 0;
+    opacity: 0; }
+  #elements #scene_3 {
+    position: absolute;
+    display: inline-block;
+    -khtml-box-sizing: border-box;
+    -ms-box-sizing: border-box;
+    -o-box-sizing: border-box;
+    box-sizing: border-box;
+    width: 728px;
+    height: 90px;
+    top: 0;
+    left: 0;
+    -webkit-transform-origin: 50% 50%;
+    -khtml-transform-origin: 50% 50%;
+    transform-origin: 50% 50%;
+    -webkit-transform-style: preserve-3d;
+    -khtml-transform-style: preserve-3d;
+    -ms-transform-style: preserve-3d;
+    -o-transform-style: preserve-3d;
+    transform-style: preserve-3d;
     z-index: 30; }
     #elements #scene_3 #txt_3 {
       position: absolute;

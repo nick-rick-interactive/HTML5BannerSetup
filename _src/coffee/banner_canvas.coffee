@@ -13,6 +13,7 @@ class BannerCanvas
     @stage = new createjs.Stage(@canvas);
 
     @els = {};
+    @OG = {};
     @storeElements($("#elements").children().toArray());
 
     console.log @els
@@ -67,6 +68,7 @@ class BannerCanvas
   enablerInitHandler: (e) =>
 
     #/// CHECK PAGE IS LOADED ///
+    console.log("enabler");
 
     if (Enabler.isPageLoaded())
 
@@ -77,6 +79,7 @@ class BannerCanvas
       Enabler.addEventListener(studio.events.StudioEvent.PAGE_LOADED, @checkVisible);
 
   checkVisible: (e) =>
+    console.log("visible");
 
     #/// CHECK PAGE IS VISIBLE ///
 
@@ -163,9 +166,13 @@ class BannerCanvas
 
   replay: (_func, _dur, _excludeStyleRemovalList) =>
 
-    for el in @els when $.inArray($(el).attr("id"),_excludeStyleRemovalList) > -1
+    for el in @els when $.inArray(el,_excludeStyleRemovalList) > -1
 
-      $(el).removeAttr("style")
+      console.log "yee"
+      for prop in @els[el]
+
+        console.log el +" "+ prop +" = "+@OG[el][prop]+" "+@els[el][prop]
+        @els[el][prop] = @OG[el][prop]
 
     @switchFunc(_func, _dur)
 
@@ -180,15 +187,16 @@ class BannerCanvas
 
   storeElement: (_el,_cont = null) =>
 
-    console.log($(_el).attr("id"));
 
     if $(_el).children().length > 0
 
-      nCont = new createjs.Container();
+      nCont = new createjs.Container().set();
       nCont.x = Number($(_el).css("left").replace("px",""));
       nCont.y = Number($(_el).css("top").replace("px",""));
+      nCont.alpha = Number($(_el).css("opacity").replace("px",""));
 
       @els[$(_el).attr("id")] = nCont;
+      @OG[$(_el).attr("id")] = nCont.clone;
 
       @stage.addChild(nCont);
 
@@ -202,14 +210,20 @@ class BannerCanvas
 
       else
 
+        console.log($(_el).attr("id"));
         obj = new createjs.Shape;
+        obj.width = Number($(_el).css("width").replace("px",""));
+        obj.height = Number($(_el).css("height").replace("px",""));
+        obj.graphics.beginFill "rgba(255,0,0,0)"
         obj.graphics.drawRect 0, 0, Number($(_el).css("width").replace("px","")), Number($(_el).css("height").replace("px",""));
 
-
+      obj.name = $(_el).attr("id");
       obj.x = Number($(_el).css("left").replace("px",""));
       obj.y = Number($(_el).css("top").replace("px",""));
+      obj.alpha = Number($(_el).css("opacity").replace("px",""));
 
       @els[$(_el).attr("id")] = obj;
+      @OG[$(_el).attr("id")] = obj.clone;
 
       if _cont
 

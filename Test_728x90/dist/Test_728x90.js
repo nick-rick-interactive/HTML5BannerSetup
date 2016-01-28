@@ -44,6 +44,7 @@ BannerCanvas = (function() {
     this.canvas = document.getElementById('main');
     this.stage = new createjs.Stage(this.canvas);
     this.els = {};
+    this.OG = {};
     this.storeElements($("#elements").children().toArray());
     console.log(this.els);
     TweenMax.ticker.addEventListener("tick", this.stage.update, this.stage);
@@ -81,6 +82,7 @@ BannerCanvas = (function() {
   }
 
   BannerCanvas.prototype.enablerInitHandler = function(e) {
+    console.log("enabler");
     if (Enabler.isPageLoaded()) {
       return this.checkVisible();
     } else {
@@ -89,6 +91,7 @@ BannerCanvas = (function() {
   };
 
   BannerCanvas.prototype.checkVisible = function(e) {
+    console.log("visible");
     if (Enabler.isVisible()) {
       return this.init();
     } else {
@@ -145,26 +148,32 @@ BannerCanvas = (function() {
   };
 
   BannerCanvas.prototype.replay = function(_func, _dur, _excludeStyleRemovalList) {
-    var el, i, len, ref;
+    var el, j, k, len, len1, prop, ref, ref1;
+    console.log("yee");
     ref = this.els;
-    for (i = 0, len = ref.length; i < len; i++) {
-      el = ref[i];
-      if ($.inArray($(el).attr("id"), _excludeStyleRemovalList) > -1) {
-        $(el).removeAttr("style");
+    for (j = 0, len = ref.length; j < len; j++) {
+      el = ref[j];
+      if ($.inArray(el, _excludeStyleRemovalList) > -1) {
+        ref1 = this.els[el];
+        for (k = 0, len1 = ref1.length; k < len1; k++) {
+          prop = ref1[k];
+          console.log(el(+" " + prop(+" = " + this.OG[el][prop] + " " + this.els[el][prop])));
+          this.els[el][prop] = this.OG[el][prop];
+        }
       }
     }
     return this.switchFunc(_func, _dur);
   };
 
   BannerCanvas.prototype.storeElements = function(_els, _cont) {
-    var el, i, len, ref, results;
+    var el, j, len, ref, results;
     if (_cont == null) {
       _cont = null;
     }
     ref = _els.reverse();
     results = [];
-    for (i = 0, len = ref.length; i < len; i++) {
-      el = ref[i];
+    for (j = 0, len = ref.length; j < len; j++) {
+      el = ref[j];
       results.push(this.storeElement(el, _cont));
     }
     return results;
@@ -175,25 +184,32 @@ BannerCanvas = (function() {
     if (_cont == null) {
       _cont = null;
     }
-    console.log($(_el).attr("id"));
     if ($(_el).children().length > 0) {
-      nCont = new createjs.Container();
+      nCont = new createjs.Container().set();
       nCont.x = Number($(_el).css("left").replace("px", ""));
       nCont.y = Number($(_el).css("top").replace("px", ""));
+      nCont.alpha = Number($(_el).css("opacity").replace("px", ""));
       this.els[$(_el).attr("id")] = nCont;
+      this.OG[$(_el).attr("id")] = nCont.clone;
       this.stage.addChild(nCont);
       return this.storeElements($(_el).children().toArray(), nCont);
     } else {
       if ($(_el).is("img")) {
         obj = new createjs.Bitmap($(_el).attr("src"));
       } else {
+        console.log($(_el).attr("id"));
         obj = new createjs.Shape;
+        obj.width = Number($(_el).css("width").replace("px", ""));
+        obj.height = Number($(_el).css("height").replace("px", ""));
+        obj.graphics.beginFill("rgba(255,0,0,0)");
         obj.graphics.drawRect(0, 0, Number($(_el).css("width").replace("px", "")), Number($(_el).css("height").replace("px", "")));
       }
+      obj.name = $(_el).attr("id");
       obj.x = Number($(_el).css("left").replace("px", ""));
       obj.y = Number($(_el).css("top").replace("px", ""));
-      console.log(obj.x + " " + $(_el).css("left"));
+      obj.alpha = Number($(_el).css("opacity").replace("px", ""));
       this.els[$(_el).attr("id")] = obj;
+      this.OG[$(_el).attr("id")] = obj.clone;
       if (_cont) {
         return _cont.addChild(obj);
       } else {
@@ -246,42 +262,225 @@ Test_728x90 = (function(superClass) {
   extend(Test_728x90, superClass);
 
   function Test_728x90() {
+    this.ctaOut = bind(this.ctaOut, this);
+    this.ctaOver = bind(this.ctaOver, this);
+    this.preLoop = bind(this.preLoop, this);
     this.finish = bind(this.finish, this);
+    this.phase3 = bind(this.phase3, this);
+    this.phase2 = bind(this.phase2, this);
     this.phase1 = bind(this.phase1, this);
+    this.setup = bind(this.setup, this);
     this.init = bind(this.init, this);
     return Test_728x90.__super__.constructor.apply(this, arguments);
   }
 
   Test_728x90.prototype.init = function() {
-    /SETUPASSETS/;
-    /STARTANIMATION/;
+    this.clubSpeed = 0.4;
+    this.els["blur_club"].filters = [new createjs.BlurFilter(24, 24, 2)];
+    this.setup();
     return this.phase1();
   };
 
+  Test_728x90.prototype.setup = function() {
+    var i, j;
+    console.log("setup");
+    TweenMax.set(this.els["cta"], {
+      x: this.OG["cta"].x - 50
+    });
+    TweenMax.set(this.els["boeing"], {
+      x: this.OG["boeing"].x - 30
+    });
+    TweenMax.set(this.els["blur_club"], {
+      x: this.OG["blur_club"].x - 50,
+      alpha: 1
+    });
+    for (i = j = 3; j >= 1; i = --j) {
+      TweenMax.set(this.els["txt_" + i], {
+        x: 0,
+        alpha: 1,
+        scale: 0.9
+      });
+      TweenMax.set(this.els["scene_" + i], {
+        x: 0,
+        alpha: 1
+      });
+      this.els["scene_" + i + "_mask"].cache(0, 0, this.els["scene_" + i + "_mask"].width, this.els["scene_" + i + "_mask"].height);
+      this.els["scene_" + i].cache(0, 0, this.els["scene_" + i + "_mask"].width, this.els["scene_" + i + "_mask"].height);
+      this.els["scene_" + i].mask = this.els["scene_" + i + "_mask"];
+      TweenMax.set(this.els["scene_" + i + "_mask"], {
+        x: 0,
+        width: this.OG["scene_" + i + "_mask"].width,
+        alpha: 1
+      });
+    }
+    return TweenMax.set(this.els["club"], {
+      x: this.OG["club"].x - 50,
+      alpha: 1
+    });
+  };
+
   Test_728x90.prototype.phase1 = function() {
-    /FIRSTANIMATION/;
-    return this.switchFunc(this.finish, 1.5);
+    console.log("phase1");
+    TweenMax.set(this.els["blur_club"], {
+      x: 0
+    });
+    TweenMax.to(this.els["txt_1"], 1, {
+      x: 0,
+      delay: 0.1,
+      scale: 1
+    });
+    TweenMax.to(this.els["scene_1_mask"], this.clubSpeed - 0.1, {
+      width: this.width,
+      delay: 0.1,
+      ease: "Linear.easeNone"
+    });
+    TweenMax.to(this.els["blur_club"], this.clubSpeed, {
+      x: (this.width * 2) + 50,
+      ease: "Linear.easeNone"
+    });
+    return this.switchFunc(this.phase2, 2.5);
+  };
+
+  Test_728x90.prototype.phase2 = function() {
+    TweenMax.set(this.els["txt_3"], {
+      alpha: 1
+    });
+    TweenMax.set(this.els["scene_3"], {
+      x: 0,
+      width: "0px",
+      alpha: 1
+    });
+    TweenMax.set(this.els["club"], {
+      x: 200,
+      alpha: 1
+    });
+    TweenMax.set(this.els["blur_club"], {
+      x: 0
+    });
+    TweenMax.to(this.els["txt_1"], this.clubSpeed, {
+      ease: "Linear.easeNone"
+    });
+    TweenMax.to(this.els["scene_1_mask"], this.clubSpeed, {
+      x: this.width,
+      width: 0,
+      ease: "Linear.easeNone"
+    });
+    TweenMax.to(this.els["txt_2"], 1, {
+      x: 0,
+      delay: 0.1,
+      scale: 1
+    });
+    TweenMax.to(this.els["scene_2_mask"], this.clubSpeed - 0.1, {
+      width: this.width,
+      delay: 0.1,
+      ease: "Linear.easeNone"
+    });
+    TweenMax.to(this.els["boeing"], 0.6, {
+      x: 0,
+      alpha: 1,
+      delay: 0.1
+    });
+    TweenMax.to(this.els["blur_club"], this.clubSpeed, {
+      x: (this.width * 2) + 50,
+      ease: "Linear.easeNone"
+    });
+    return this.switchFunc(this.phase3, 2.5);
+  };
+
+  Test_728x90.prototype.phase3 = function() {
+    TweenMax.set(this.els["blur_club"], {
+      x: 0
+    });
+    TweenMax.to(this.els["txt_2"], this.clubSpeed, {
+      ease: "Linear.easeNone"
+    });
+    TweenMax.to(this.els["scene_2_mask"], this.clubSpeed, {
+      x: this.width,
+      width: 0,
+      ease: "Linear.easeNone"
+    });
+    TweenMax.to(this.els["txt_3"], 0.5, {
+      x: 0,
+      delay: 0.3
+    });
+    TweenMax.to(this.els["scene_3_mask"], this.clubSpeed - 0.1, {
+      width: this.width,
+      delay: 0.1,
+      ease: "Linear.easeNone"
+    });
+    TweenMax.to(this.els["club"], 0.5, {
+      x: this.OG["club"].x,
+      delay: 0.2
+    });
+    TweenMax.to(this.els["cta"], 0.5, {
+      x: this.OG["cta"].x,
+      alpha: 1,
+      delay: 1
+    });
+    this.els["cta"].addEventListener("mouseover", this.ctaOver);
+    this.els["cta"].addEventListener("mouseout", this.ctaOut);
+    TweenMax.to(this.els["blur_club"], this.clubSpeed, {
+      x: (this.width * 2) + 50,
+      ease: "Linear.easeNone"
+    });
+    return this.switchFunc(this.finish, 3.5);
   };
 
   Test_728x90.prototype.finish = function() {
     if (this.curLoop === this.loop) {
-      /ENDNOANIMATION/;
       return this.end(this.init);
     } else {
-      /ENDWITHANIMATION/;
-      return TweenMax.to($("#start"), 0.3, {
-        rotationX: -90,
-        opacity: 0,
-        y: $("#start").height() / 2,
-        ease: Back.easeIn,
-        delay: 0.3,
+      TweenMax.to(this.els["boeing"], 0.3, {
+        alpha: 0,
+        x: 20
+      });
+      return TweenMax.to(this.els["cta"], 0.3, {
+        alpha: 0,
+        x: 20,
         onComplete: (function(_this) {
           return function() {
-            return _this.end(_this.init);
+            return _this.end(_this.preLoop, 0, ["txt_3", "scene_3", "club"]);
           };
         })(this)
       });
     }
+  };
+
+  Test_728x90.prototype.preLoop = function() {
+    this.setup();
+    console.log("postsetup");
+    this.els["cta"].removeEventListener("mouseover", this.ctaOver);
+    this.els["cta"].removeEventListener("mouseout", this.ctaOut);
+    TweenMax.set(this.els["txt_3"], {
+      x: this.OG["txt_3"].x
+    });
+    TweenMax.set(this.els["scene_3"], {
+      width: this.width
+    });
+    TweenMax.set(this.els["club"], {
+      x: this.OG["club"].x
+    });
+    TweenMax.to(this.els["txt_3"], this.clubSpeed, {});
+    TweenMax.to(this.els["club"], this.clubSpeed, {
+      x: -this.width
+    });
+    TweenMax.to(this.els["scene_3"], this.clubSpeed, {
+      x: this.width,
+      width: 0
+    });
+    return this.phase1();
+  };
+
+  Test_728x90.prototype.ctaOver = function() {
+    return TweenMax.to(this.els["cta"], 0.2, {
+      x: 3
+    });
+  };
+
+  Test_728x90.prototype.ctaOut = function() {
+    return TweenMax.to(this.els["cta"], 0.2, {
+      x: 0
+    });
   };
 
   return Test_728x90;

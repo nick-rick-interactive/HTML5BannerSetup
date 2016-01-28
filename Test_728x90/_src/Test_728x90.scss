@@ -47,9 +47,12 @@ body{
     z-index: 70;
   }
 
+  #scene_1_mask{
+    @include graphic($width, $height);
+    @include opacity(0);
+  }
   #scene_1{
-    @include graphic(0, $height);
-    overflow-x: hidden;
+    @include graphic($width, $height);
     z-index: 10;
 
     #txt_1{
@@ -57,9 +60,12 @@ body{
     }
   }
 
+  #scene_2_mask{
+    @include graphic($width, $height);
+    @include opacity(0);
+  }
   #scene_2{
-    @include graphic(0, $height);
-    overflow-x: hidden;
+    @include graphic($width, $height);
     z-index: 20;
 
     #txt_2{
@@ -67,9 +73,12 @@ body{
     }
   }
 
+  #scene_3_mask{
+    @include graphic($width, $height);
+    @include opacity(0);
+  }
   #scene_3{
-    @include graphic(0, $height);
-    overflow-x: hidden;
+    @include graphic($width, $height);
     z-index: 30;
 
     #txt_3{

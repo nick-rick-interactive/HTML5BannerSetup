@@ -21,6 +21,8 @@ var del = require('del');
 var tap = require('gulp-tap');
 
 // COMPILING
+var plumber   = require( 'gulp-plumber' );
+var beep      = require( 'beepbeep' );
 var jade = require('gulp-jade');
 var coffee = require('gulp-coffee');
 var sass = require('gulp-sass');
@@ -31,6 +33,11 @@ var imagemin = require('gulp-imagemin');
 var imageMinJpegTran = require('imagemin-jpegtran');
 var imageMinPngQuant = require('imagemin-pngquant');
 
+//Plumber Hanlder
+var onError = function (err) {
+    beep([0, 0, 0]);
+    gutil.log(gutil.colors.red(err));
+};
 
 // ZIP UP DIST
 var zip = require('gulp-zip');
@@ -111,6 +118,9 @@ gulp.task('jade', function () {
     var img2 = new RegExp("_img/","g");
 
     return gulp.src(src.jade)
+        .pipe(plumber({
+            errorHandler: onError
+        }))
         .pipe(jade({locals: YOUR_LOCALS,pretty:true}))
         .pipe(replace({
             patterns: [
@@ -135,6 +145,9 @@ gulp.task('coffee', function () {
             "_src/coffee/"+bannerClass+".coffee",
             src.coffee
         ])
+        .pipe(plumber({
+            errorHandler: onError
+        }))
         .pipe(concat("concat.coffee"))
         .pipe(coffee({bare: true}))
         .pipe(rename(filename+'.js'))
@@ -149,6 +162,9 @@ gulp.task('sass', function () {
     var img1 = new RegExp("images/","g");
     var img2 = new RegExp("_img/","g");
     return gulp.src(src.sass)
+        .pipe(plumber({
+            errorHandler: onError
+        }))
         .pipe(sass({
             errLogToConsole: true
         }).on('error', sass.logError))
@@ -194,6 +210,7 @@ gulp.task('serve', function () {
         proxy: 'http://localhost:63342/'+path.basename(__dirname)+'/'+dirs.dist+'/'+filename+'.html'
     });
 
+    gulp.watch("./_src/coffee/**", ['coffee']);
     gulp.watch(src.coffee, ['coffee']);
     gulp.watch(src.sass, ['sass']);
     gulp.watch(src.img, ['copy:images']);
