@@ -23,7 +23,7 @@ Sass is used for all css.  A Cross Browser CSS3 mixin file (<a href="https://git
 
 ### <a href="http://sass-lang.com//" target="_blank">Gulp</a><br/>
 
-Gulp is setup to use 3 main functions<br/><br/>
+Gulp is setup to use 5 main functions<br/><br/>
 
 ##### new-banner<br/>
 This will generate the template files needed to create a banner.  Use the "banner" argument to send the folder naming convention.  Each variable for --banner needs to separated by a * in the following order:<br/>
@@ -36,6 +36,12 @@ This will generate the template files needed to create a banner.  Use the "banne
     Exp-Height      REQUIRED FOR EXPANDING AND FLOATING UNITS
     Offset-X        OPTIONAL FOR EXPANDING UNITS
     Offset-Y        OPTIONAL FOR EXPANDING UNITS
+
+    (--type)
+    Type of Banner  OPTIONAL    "in-page, floating, expanding, adwords"
+
+    (--lang)
+    Banner Language OPTIONAL    "js, canvas"
     
 The code should look similar to the following:
 
