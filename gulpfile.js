@@ -2,6 +2,7 @@ var fs = require('fs');
 var path = require('path');
 
 var gulp = require('gulp');
+var gutil = require('gulp-util');
 
 //GET ARGUMENTS FOR BANNER SIZE
 var argv = require('yargs').argv;
@@ -380,7 +381,16 @@ gulp.task('cb-move-files', function () {
 });
 
 gulp.task('cb-rename', function () {
+    var reW = new RegExp(vals[1],"g");
+    var reH = new RegExp(vals[2],"g");
     var re = new RegExp(filename,"g");
+    gulp.src(newFilename+"/_src/"+newFilename+".json")
+        .pipe(replace({
+            patterns: [
+                {match: reW,replacement: newVals[1]},
+                {match: reH,replacement: vals[2]}
+            ]
+        }));
     return gulp.src(newFilename+"/_src/**/*")
         .pipe(replace({
             patterns: [
