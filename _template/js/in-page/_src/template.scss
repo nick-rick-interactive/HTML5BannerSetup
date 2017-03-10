@@ -4,8 +4,11 @@
 /// _PREFIX___WIDTH_x_HEIGHT_
 
 
-$width:   _WIDTH_px;
-$height:  _HEIGHT_px;
+$width:   0px;
+$height:  0px;
+
+//Gulp Injects the correct Height and Width below.
+//w_h_inject
 
 *{
   margin: 0;

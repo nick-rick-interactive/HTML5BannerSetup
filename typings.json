@@ -1,0 +1,6 @@
+{
+  "globalDependencies": {
+    "enabler": "file:custom_typings/enabler.d.ts",
+    "main": "file:custom_typings/main.d.ts"
+  }
+}

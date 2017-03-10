@@ -23,15 +23,10 @@ html(lang='en')
 
     body
 
-        canvas#main(width=_WIDTH_,height=_HEIGHT_)
+        #main
 
-        #elements
-
-            #ctacont(data-type="container")
-
-                #cta(data-type="rectangle")
-                #overlay(data-type="rectangle")
-
-            img#bg(src="images/bg.png",data-type="ani-elem")
+            a#cta(href='javascript:ExitApi.exit()')
+            a#overlay(href='javascript:ExitApi.exit()')
+            #bg
 
         script(src=config.prefix + "_" + config.width + "x" + config.height + ".min.js")

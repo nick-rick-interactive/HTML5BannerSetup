@@ -24,15 +24,22 @@ var tap = require('gulp-tap');
 // COMPILING
 var plumber   = require( 'gulp-plumber' );
 var beep      = require( 'beepbeep' );
-var jade = require('gulp-jade');
+var pug = require('gulp-pug');
 var coffee = require('gulp-coffee');
+var ts = require('gulp-typescript');
 var sass = require('gulp-sass');
-//var compass = require('gulp-compass');
+
+// PostCSS
+var postcss = require("gulp-postcss");
 var nano = require('gulp-cssnano');
-var prefix = require('gulp-autoprefixer');
+var prefix = require('autoprefixer');
+
+// Image
 var imagemin = require('gulp-imagemin');
-var imageMinJpegTran = require('imagemin-jpegtran');
 var imageMinPngQuant = require('imagemin-pngquant');
+var recompress = require('imagemin-jpeg-recompress');
+
+var clean = require('gulp-clean');
 
 //Plumber Hanlder
 var onError = function (err) {
@@ -75,13 +82,15 @@ var excludeGitignore = require('gulp-exclude-gitignore');
 var directories;
 var taskCount;
 var src = {
-    jade: dirs.src+'/'+filename+'.jade',
+    pug: dirs.src+'/'+filename+'.pug',
     coffee: dirs.src + '/'+filename+'.coffee',
+    ts: dirs.src + '/'+filename+'.ts',
     sass: dirs.src + '/'+filename+'.scss',
     config: dirs.src + '/'+filename+'.json',
     img: filename + "/_img/**"
 }
 var config;
+var varInjection;
 
 
 // ---------------------------------------------------------------------
@@ -99,58 +108,68 @@ gulp.task('copy', [
 ]);
 
 gulp.task('copy:images', function () {
+    var qual = (config.quality) ? config.quality : 60;
     return gulp.src(src.img)
         .pipe(imagemin({
             progressive: true,
             use: [
-                imageMinJpegTran({progessive: true}),
-                imageMinPngQuant({quality: '65-80', speed: 4})
+                recompress({
+                    loops:3,
+                    min:qual,
+                    max:qual
+                }),
+                imageMinPngQuant({quality: qual+'-'+qual, speed: 4})
             ]
         }))
         .pipe(gulp.dest(dirs.dist + ""))
         .pipe(reload({stream: true}));
 });
 
-gulp.task('jade', function () {
-    var YOUR_LOCALS = {
-        size: filename
-    };
+gulp.task('pug', function () {
     var img1 = new RegExp("images/","g");
     var img2 = new RegExp("_img/","g");
 
-    return gulp.src(src.jade)
+    return gulp.src(src.pug)
         .pipe(plumber({
             errorHandler: onError
         }))
-        .pipe(jade({locals: YOUR_LOCALS,pretty:true}))
+        .pipe(pug({locals: varInjection,pretty:true}))
         .pipe(replace({
             patterns: [
                 {match: img1,replacement: ""},
                 {match: img2,replacement: ""}
             ]
         }))
-        .pipe(rename(filename+'.html'))
+        .pipe(rename('index.html'))
         .pipe(gulp.dest(dirs.dist))
         .pipe(reload({stream: true}));
 });
 
-gulp.task('coffee', function () {
+gulp.task('ts', function () {
+    var tsProject = ts.createProject('tsconfig.json');
     config = require("./"+src.config);
+    varInjection = {
+        config: config,
+        info: pkg,
+        size: filename
+    };
     var bannerClass;
     if(config['type']=="adwords"){
         bannerClass = (config['lang']=="js") ? "banner_aw" : "banner_aw_canvas";
     }else{
         bannerClass = (config['lang']=="js") ? "banner" : "banner_canvas";
+        bannerClass = (config['lang']=="canvas_sf") ? "banner_canvas_sf" : bannerClass;
     }
-    return gulp.src([
-            "_src/coffee/"+bannerClass+".coffee",
-            src.coffee
-        ])
+    var tsResult = gulp.src([
+        "_src/ts/"+bannerClass+".ts",
+        src.ts
+    ])
         .pipe(plumber({
             errorHandler: onError
         }))
-        .pipe(concat("concat.coffee"))
-        .pipe(coffee({bare: true}))
+        .pipe(concat("concat.ts"))
+        .pipe(tsProject())
+    return tsResult.js
         .pipe(rename(filename+'.js'))
         .pipe(gulp.dest(dirs.dist))
         .pipe(plugins.uglify({ mangle:true }))
@@ -162,22 +181,27 @@ gulp.task('coffee', function () {
 gulp.task('sass', function () {
     var img1 = new RegExp("images/","g");
     var img2 = new RegExp("_img/","g");
+    var inject = new RegExp("//w_h_inject","g");
+    var plugs = [
+        prefix({
+            browsers: ['last 2 versions'],
+            cascade: false
+        }),
+        require('cssgrace')
+    ]
     return gulp.src(src.sass)
         .pipe(plumber({
             errorHandler: onError
         }))
+        .pipe(replace({
+            patterns: [
+                {match: inject,replacement: "$width:"+config.width+"px; $height:"+config.height+"px; $prefix:"+config.prefix+";"}
+            ]
+        }))
         .pipe(sass({
             errLogToConsole: true
         }).on('error', sass.logError))
-        /*.pipe(compass({
-         css: dirs.dist,
-         sass: dirs.dist,
-         image: dirs.dist+'/images'
-         })*/
-        .pipe(prefix({
-            browsers: ['last 2 versions'],
-            cascade: false
-        }))
+        .pipe(postcss(plugs))
         .pipe(replace({
             patterns: [
                 {match: img1,replacement: ""},
@@ -194,34 +218,39 @@ gulp.task('sass', function () {
 
 gulp.task('zip', function () {
     return gulp.src([
-            dirs.dist + "/**/*",
-            '!' + dirs.dist + "/" + filename + ".zip",
-            '!' + dirs.dist + "/" + filename + ".js",
-            '!' + dirs.dist + "/" + filename + ".css"
-        ])
+        dirs.dist + "/**/*",
+        '!' + dirs.dist + "/" + filename + ".zip",
+        '!' + dirs.dist + "/" + filename + ".js",
+        '!' + dirs.dist + "/" + filename + ".css"
+    ])
         .pipe(zip(filename+'.zip'))
         .pipe(gulp.dest(dirs.dist))
         .pipe(gulp.dest("zipped"))
+});
+
+gulp.task('includes', function () {
+    return gulp.src('./includes/*.js')
+        .pipe(gulp.dest(dirs.dist))
 });
 
 gulp.task('serve', function () {
 
     console.log(path.basename(path.dirname()));
     browserSync.init({
-        proxy: 'http://localhost:63342/'+path.basename(__dirname)+'/'+dirs.dist+'/'+filename+'.html'
+        proxy: 'http://localhost:63342/'+path.basename(__dirname)+'/'+dirs.dist+'/index.html'
     });
 
-    gulp.watch("./_src/coffee/**", ['coffee']);
-    gulp.watch(src.coffee, ['coffee']);
+    gulp.watch("./_src/ts/**", ['ts']);
+    gulp.watch(src.ts, ['ts']);
     gulp.watch(src.sass, ['sass']);
     gulp.watch(src.img, ['copy:images']);
-    gulp.watch(src.jade, ['jade']);
+    gulp.watch(src.pug, ['pug']);
 
     gulp.watch([
-        src.coffee,
+        src.ts,
         src.sass,
         src.img,
-        src.jade
+        src.pug
     ], ['zip'])
 
 });
@@ -242,10 +271,11 @@ gulp.task('build', function (done) {
 
     runSequence(
         'clean',
-        'coffee',
+        'ts',
         'sass',
         'copy',
-        'jade',
+        'pug',
+        'includes',
         'zip',
         'serve',
         done);
@@ -273,25 +303,33 @@ gulp.task('package', function () {
         if(taskCount!=directories.length+1){
 
             filename = directories[taskCount-1];
-            console.log("Packaging "+directories[taskCount-1]);
 
             dirs.src = filename + "/_src";
             dirs.dist = filename + "/dist";
 
             src = {
-                jade: dirs.src+'/'+filename+'.jade',
-                coffee: dirs.src + '/'+filename+'.coffee',
+                pug: dirs.src+'/'+filename+'.pug',
+                ts: dirs.src + '/'+filename+'.ts',
                 sass: dirs.src + '/'+filename+'.scss',
-                img: filename + "/_img/**"
+                img: filename + "/_img/**",
+                config: dirs.src + '/'+filename+'.json'
             }
+
+            config = require("./"+src.config);
+            varInjection = {
+                config: config,
+                info: pkg,
+                size: filename
+            };
 
 
             runSequence(
                 'clean',
-                'coffee',
+                'ts',
                 'sass',
                 'copy',
-                'jade',
+                'pug',
+                'includes',
                 'zip',
                 runTasks);
         }else{
@@ -303,15 +341,21 @@ gulp.task('package', function () {
 
     runSequence(
         'getDirectories',
+        'eraseZips',
         runTasks
     )
 });
 
 gulp.task('getDirectories',function(){
-    return gulp.src(argv.prefix+"_*")
+    return gulp.src([argv.prefix+"_*","!"+argv.prefix+"_*.zip"])
         .pipe(tap(function(file,t){
             directories.push(path.basename((file.path)))
         }));
+})
+
+gulp.task('eraseZips',function(){
+    return gulp.src("./zipped")
+        .pipe(clean())
 })
 
 gulp.task('zipAll',function(){
@@ -353,6 +397,7 @@ gulp.task('copy-banner', function (done) {
     runSequence(
         "cb-move-files",
         "cb-rename",
+        "cb-json",
         "cb-remove-temp",
         done);
 });
@@ -363,7 +408,7 @@ gulp.task('cb-move-files', function () {
     newVals = (argv.newBanner) ? argv.newBanner.split("*") : ["Banner","300","250","300","600"];
 
     newVals[3] = newVals[3] ? newVals[3] : newVals[1]; // FOR EXPANDING AND FLOATING UNITS
-    newVals[4] = newVals[4] ? newVals[4] : newVals[2]+100; // FOR EXPANDING AND FLOATING UNITS
+    newVals[4] = newVals[4] ? newVals[4] : Number(newVals[2])+100; // FOR EXPANDING AND FLOATING UNITS
     newVals[5] = newVals[5] ? newVals[5] : "0"; // FOR EXPANDING UNITS
     newVals[6] = newVals[6] ? newVals[6] : "0"; // FOR EXPANDING UNITS
 
@@ -374,33 +419,46 @@ gulp.task('cb-move-files', function () {
     newFilename = (bannerType=="in-page") ?  newVals[0]+"_"+newVals[1]+"x"+newVals[2] : newVals[0]+"_"+newVals[1]+"x"+newVals[2]+"_exp_"+newVals[3]+"x"+newVals[4];
 
     return gulp.src([
-            filename + "/**/*",
-            "!" + filename + "/dist/**/*"
-        ])
+        filename + "/**/*",
+        "!" + filename + "/dist/**/*"
+    ])
         .pipe(gulp.dest(newFilename))
 });
 
 gulp.task('cb-rename', function () {
-    var reW = new RegExp(vals[1],"g");
-    var reH = new RegExp(vals[2],"g");
     var re = new RegExp(filename,"g");
-    gulp.src(newFilename+"/_src/"+newFilename+".json")
+    var reX = new RegExp(vals[1]+"x"+vals[2],"g");
+    var reC = new RegExp(vals[1]+", "+vals[2],"g");
+    return gulp.src([newFilename+"/_src/**/*"])
         .pipe(replace({
             patterns: [
-                {match: reW,replacement: newVals[1]},
-                {match: reH,replacement: vals[2]}
-            ]
-        }));
-    return gulp.src(newFilename+"/_src/**/*")
-        .pipe(replace({
-            patterns: [
-                {match: re,replacement: newFilename}
+                {match: re,replacement: newFilename},
+                {match: reX,replacement: newVals[1]+"x"+newVals[2]},
+                {match: reC,replacement: newVals[1]+", "+newVals[2]}
             ]
         }))
         .pipe(rename(function(path){
             path.basename = newFilename
         }))
-        .pipe(gulp.dest(newFilename+"/_src/"))
+        .pipe(gulp.dest(newFilename+"/_src/"));
+});
+
+gulp.task('cb-json', function () {
+    var reP = new RegExp(vals[0],"g");
+    var reW = new RegExp(vals[1],"g");
+    var reH = new RegExp(vals[2],"g");
+    return gulp.src(newFilename+"/_src/*.json")
+        .pipe(replace({
+            patterns: [
+                {match: reP,replacement: newVals[0]},
+                {match: reW,replacement: newVals[1]},
+                {match: reH,replacement: newVals[2]}
+            ]
+        }))
+        .pipe(rename(function(path){
+            path.basename = newFilename
+        }))
+        .pipe(gulp.dest(newFilename+"/_src/"));
 });
 
 gulp.task('cb-remove-temp', function () {
@@ -442,7 +500,7 @@ gulp.task('nb-move-files', function () {
 
     vals = (argv.banner) ? argv.banner.split("*") : ["Banner","728","90","728","200","0","0"];
     vals[3] = vals[3] ? vals[3] : vals[1]; // FOR EXPANDING AND FLOATING UNITS
-    vals[4] = vals[4] ? vals[4] : vals[2]+100; // FOR EXPANDING AND FLOATING UNITS
+    vals[4] = vals[4] ? vals[4] : Number(vals[2])+100; // FOR EXPANDING AND FLOATING UNITS
     vals[5] = vals[5] ? vals[5] : "0"; // FOR EXPANDING UNITS
     vals[6] = vals[6] ? vals[6] : "0"; // FOR EXPANDING UNITS
 
@@ -456,6 +514,8 @@ gulp.task('nb-move-files', function () {
 });
 
 gulp.task('nb-rename', function () {
+    var reX = new RegExp(vals[1]+"x"+vals[2],"g");
+    var reC = new RegExp(vals[1]+", "+vals[2],"g");
     return gulp.src(filename+"/_src/**/*")
         .pipe(replace({
             patterns: [
@@ -467,7 +527,9 @@ gulp.task('nb-rename', function () {
                 {match: /_OFFSET-X_/g,replacement: vals[5]},
                 {match: /_OFFSET-Y_/g,replacement: vals[6]},
                 {match: /_TYPE_/g,replacement: bannerType},
-                {match: /_LANG_/g,replacement: bannerLang}
+                {match: /_LANG_/g,replacement: bannerLang},
+                {match: reX,replacement: newVals[1]+"x"+newVals[2]},
+                {match: reC,replacement: newVals[1]+", "+newVals[2]}
             ]
         }))
         .pipe(rename(function(path){
