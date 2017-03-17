@@ -1,38 +1,18 @@
-class BannerCanvasAW {
-
-    width: number;
-    height: number;
-    type: string;
-    loop: number;
-    curLoop: number;
-
-    imgLoads: Array<CJSImg>;
-    imgsLoaded: number;
+/**
+ * Created by nricken on 3/16/17.
+ */
+class JSLangCanvas extends JSLang{
 
     canvas: HTMLCanvasElement;
     stage: createjs.Stage;
 
-    els: Object;
-    OG: Object;
+    constructor(B:Banner){
 
-    switchInt: number;
-
-    constructor(_width: number = 0, _height: number = 0, _loop: number = 3) {
-
-        this.width = _width;
-        this.height = _height;
-        this.loop = _loop;
-        this.curLoop = 1;
-        this.imgLoads = [];
-        this.imgsLoaded = 0;
-
-        /// STORE ELEMENTS THAT WILL BE ANIMATED ///
+        super(B);
 
         this.canvas = document.getElementById('main') as HTMLCanvasElement;
         this.stage = new createjs.Stage(this.canvas);
 
-        this.els = {};
-        this.OG = {};
         this.storeElements($("#elements").children().toArray());
 
         if(TweenMax){
@@ -53,9 +33,14 @@ class BannerCanvasAW {
         this.els['ctacont'].enableMouseOver = true;
 
         this.loadImages();
-    };
+
+    }
+
+    // PRELOAD IMAGES
 
     loadImages = () => {
+
+        //
 
         for( let img in this.imgLoads) {
 
@@ -68,6 +53,8 @@ class BannerCanvasAW {
 
     checkLoad = () =>{
 
+        //
+
         this.imgsLoaded++;
 
         if(this.imgsLoaded==this.imgLoads.length){
@@ -78,27 +65,14 @@ class BannerCanvasAW {
 
             }
 
-            this.init(null);
+            this.B.publisherSetup();
 
         }
 
-    };
-
-    /// OVERWRITE FUNCTION (REQUIRED) ///
-
-    init = (e:studio.events.StudioEvent):void => {
-
-        alert("you must add an init function to the extended type-script class");
-
-        if(e){
-
-            console.log(e);
-
-        }
 
     };
 
-    /// BASE CLASS FUNCTIONS ///
+    // UTILS
 
     storeElements = (_els:Array<any>, _cont:createjs.Container = null) => {
 
@@ -172,61 +146,4 @@ class BannerCanvasAW {
         }
 
     };
-
-    end = (_func:Function, _dur:number = 0, _excludeStyleRemovalList:Array<string> = []):void => {
-
-        if(this.curLoop == this.loop) {
-
-            clearInterval(this.switchInt);
-
-        }else {
-
-            this.curLoop++;
-            this.replay(_func, _dur, _excludeStyleRemovalList);
-
-        }
-
-    };
-
-    exit = ():void =>{
-
-        if (this.switchInt){
-
-            clearInterval(this.switchInt);
-
-        }
-
-        Enabler.exit("exit");
-
-    };
-
-    replay = (_func:Function, _dur:number = 0, _excludeStyleRemovalList:Array<string> = []):void => {
-
-        for( let el in this.els){
-
-            if($.inArray($(this.els[el]).attr("id"),_excludeStyleRemovalList) > -1){
-
-                $(this.els[el]).removeAttr("style");
-
-            }
-        }
-
-        this.switchFunc(_func, _dur);
-
-    };
-
-
-    /// UTILITY CLASS FUNCTIONS ///
-
-    switchFunc = (_func:Function, _dur:number=0) => {
-
-        if (this.switchInt){
-
-            clearInterval(this.switchInt);
-
-        }
-
-        this.switchInt = setInterval(_func,_dur*1000);
-    };
-
 }

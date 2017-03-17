@@ -25,7 +25,6 @@ var tap = require('gulp-tap');
 var plumber   = require( 'gulp-plumber' );
 var beep      = require( 'beepbeep' );
 var pug = require('gulp-pug');
-var coffee = require('gulp-coffee');
 var ts = require('gulp-typescript');
 var sass = require('gulp-sass');
 
@@ -58,7 +57,8 @@ var filename = (argv.banner) ? argv.banner : "Banner_728x90";
 var newVals = ["Banner",728,90];
 var newFilename = (argv.newBanner) ? argv.newBanner : "Banner_728x90";
 var bannerType = "in-page";
-var bannerLang = "js";
+var bannerLang = "javascript";
+var bannerPub = "doubleclick";
 
 var dirs = pkg['configs'].directories;
 
@@ -83,7 +83,6 @@ var directories;
 var taskCount;
 var src = {
     pug: dirs.src+'/'+filename+'.pug',
-    coffee: dirs.src + '/'+filename+'.coffee',
     ts: dirs.src + '/'+filename+'.ts',
     sass: dirs.src + '/'+filename+'.scss',
     config: dirs.src + '/'+filename+'.json',
@@ -153,22 +152,24 @@ gulp.task('ts', function () {
         info: pkg,
         size: filename
     };
-    var bannerClass;
+    /*var bannerClass;
     if(config['type']=="adwords"){
         bannerClass = (config['lang']=="js") ? "banner_aw" : "banner_aw_canvas";
     }else{
         bannerClass = (config['lang']=="js") ? "banner" : "banner_canvas";
         bannerClass = (config['lang']=="canvas_sf") ? "banner_canvas_sf" : bannerClass;
-    }
+    }*/
     var tsResult = gulp.src([
-        "_src/ts/"+bannerClass+".ts",
+        "_src/ts/com/*.ts",
+        "_src/ts/language/*.ts",
+        "_src/ts/publisher/*.ts",
         src.ts
     ])
         .pipe(plumber({
             errorHandler: onError
         }))
         .pipe(concat("concat.ts"))
-        .pipe(tsProject())
+        .pipe(tsProject());
     return tsResult.js
         .pipe(rename(filename+'.js'))
         .pipe(gulp.dest(dirs.dist))
@@ -229,8 +230,11 @@ gulp.task('zip', function () {
 });
 
 gulp.task('includes', function () {
-    return gulp.src('./includes/*.js')
-        .pipe(gulp.dest(dirs.dist))
+    if(config.pub=="simplifi"){
+        var list = (config.lang=="canvas") ? "./includes/**/*.js" : "./includes/*.js";
+        return gulp.src(list)
+            .pipe(gulp.dest(dirs.dist))
+    }
 });
 
 gulp.task('serve', function () {
@@ -414,6 +418,7 @@ gulp.task('cb-move-files', function () {
 
     bannerType = (argv.type) ? argv.type : bannerType;
     bannerLang = (argv.lang) ? argv.lang : bannerLang;
+    bannerPub = (argv.pub) ? argv.pub : bannerPub;
 
     filename = (bannerType=="in-page") ? vals[0]+"_"+vals[1]+"x"+vals[2] : vals[0]+"_"+vals[1]+"x"+vals[2]+"_exp_"+vals[3]+"x"+vals[4];
     newFilename = (bannerType=="in-page") ?  newVals[0]+"_"+newVals[1]+"x"+newVals[2] : newVals[0]+"_"+newVals[1]+"x"+newVals[2]+"_exp_"+newVals[3]+"x"+newVals[4];
@@ -506,6 +511,7 @@ gulp.task('nb-move-files', function () {
 
     bannerType = (argv.type) ? argv.type : bannerType;
     bannerLang = (argv.lang) ? argv.lang : bannerLang;
+    bannerPub = (argv.pub) ? argv.pub : bannerPub;
 
     filename = (bannerType=="in-page") ? vals[0]+"_"+vals[1]+"x"+vals[2] : vals[0]+"_"+vals[1]+"x"+vals[2]+"_exp_"+vals[3]+"x"+vals[4];
 
@@ -528,6 +534,7 @@ gulp.task('nb-rename', function () {
                 {match: /_OFFSET-Y_/g,replacement: vals[6]},
                 {match: /_TYPE_/g,replacement: bannerType},
                 {match: /_LANG_/g,replacement: bannerLang},
+                {match: /_PUB_/g,replacement: bannerPub},
                 {match: reX,replacement: newVals[1]+"x"+newVals[2]},
                 {match: reC,replacement: newVals[1]+", "+newVals[2]}
             ]

@@ -54,19 +54,34 @@
     }
   },
   "js_includes": {
-    "standard": [
-      "https://s0.2mdn.net/ads/studio/Enabler.js",
-      "https://tpc.googlesyndication.com/pagead/gadgets/html5/api/exitapi.js",
-      "https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js",
-      "https://s0.2mdn.net/ads/studio/cached_libs/tweenmax_1.18.0_499ba64a23378545748ff12d372e59e9_min.js",
-      "https://s0.2mdn.net/ads/studio/cached_libs/easeljs_0.8.1_58add2e69ca7fbe25e8f82a2b5f6a510_min.js"
-    ],
-    "_overwrite": [
-      "zepto.min.js",
-      "TweenLite.min.js",
-      "EasePack.min.js",
-      "easel.min.js"
-    ]
+    "language":{
+      "canvas":[
+        "https://s0.2mdn.net/ads/studio/cached_libs/easeljs_0.8.1_58add2e69ca7fbe25e8f82a2b5f6a510_min.js"
+      ]
+    },
+    "publisher":{
+      "doubleclick": [
+        "https://s0.2mdn.net/ads/studio/Enabler.js",
+        "https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js",
+        "https://s0.2mdn.net/ads/studio/cached_libs/tweenmax_1.18.0_499ba64a23378545748ff12d372e59e9_min.js"
+      ],
+      "adwords": [
+        "https://tpc.googlesyndication.com/pagead/gadgets/html5/api/exitapi.js",
+        "https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js",
+        "https://s0.2mdn.net/ads/studio/cached_libs/tweenmax_1.18.0_499ba64a23378545748ff12d372e59e9_min.js"
+      ],
+      "simplifi": [
+        "zepto.min.js",
+        "TweenLite.min.js",
+        "EasePack.min.js"
+      ],
+      "simplifi_canvas": [
+        "zepto.min.js",
+        "TweenLite.min.js",
+        "EasePack.min.js",
+        "easel.min.js"
+      ]
+    }
   },
   "click_link": "http://www.planetfitness.com/offers/1349?utm_source=Simpli.fi&utm_campaign=BC_Upgrade&utm_medium=Banner",
   "license": {

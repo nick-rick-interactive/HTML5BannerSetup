@@ -7,5 +7,6 @@
   "offset-x":_OFFSET-X_,
   "offset-y":_OFFSET-Y_,
   "lang":"_LANG_",
-  "type":"_TYPE_"
+  "type":"_TYPE_",
+  "quality":65
 }

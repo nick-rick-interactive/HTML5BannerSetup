@@ -1,6 +1,7 @@
 {
   "globalDependencies": {
     "enabler": "file:custom_typings/enabler.d.ts",
+    "exitapi": "file:custom_typings/exitapi.d.ts",
     "main": "file:custom_typings/main.d.ts"
   }
 }

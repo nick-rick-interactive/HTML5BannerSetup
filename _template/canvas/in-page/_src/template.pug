@@ -10,20 +10,27 @@ html(lang='en')
 
         link(href = config.prefix + "_" + config.width + "x" + config.height + ".min.css", rel = 'stylesheet')/
 
-        if info.js_includes.overwrite
-            each i in info.js_includes.overwrite
-                script(src=i)
+        // TODO - AND THE LANGUAGE AND PUB JS LOGIC FROM THE CONFIG
+
+        if config.pub.indexOf('simplifi')>0
+            if config.pub!="simplifi"
+                each i in info.js_includes.publisher.simplifi_canvas
+                    script(src=i)
+            else
+                each i in info.js_includes.publisher[config.pub]
+                    script(src=i)
         else
-            each i in info.js_includes.standard
+            each i in info.js_includes.publisher[config.pub]
                 script(src=i)
+
+        each i in info.js_includes.language.canvas
+            script(src=i)
 
         script
             | var clickTag = "";
             | var banner = "";
 
     body
-
-        canvas#main(width=_WIDTH_,height=_HEIGHT_)
 
         #elements
 
