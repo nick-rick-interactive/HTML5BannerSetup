@@ -1,0 +1,70 @@
+@import "../../_src/sass/banner.scss";
+
+
+/// _PREFIX___WIDTH_x_HEIGHT__exp__EXP_W_x_EXP_H_
+
+
+$width:   _WIDTH_px;
+$height:  _HEIGHT_px;
+
+$float-width:  _EXP_W_px;
+$float-height:  _EXP_H_px;
+$float-offset-x:  _OFFSET_X_px;
+$float-offset-y:  _OFFSET_Y_px;
+
+*{
+  margin: 0;
+  padding: 0;
+  outline: none;
+}
+
+body{
+  background: gray;
+}
+
+#main{
+  @include container($float-width, $float-height, $float-offset-y, $float-offset-x);
+
+  #collapsed-panel{
+    @include container($width, $height);
+    position: absolute;
+    z-index: 2;
+
+    #cta{
+      @include cta(200px,100px,$width - 220px,$height - 120px);
+    }
+
+    #overlay{
+      @include overlay($width, $height);
+    }
+
+    #bg{
+      @include graphic($width, $height);
+      @include banner-img("images/bg.jpg");
+      @include opacity(1);
+      z-index: 2;
+    }
+  }
+
+  #floating-panel{
+    @include container($float-width, $float-height, $float-offset-y, $float-offset-x);
+    position: absolute;
+    z-index: 3;
+
+    #cta-float{
+      @include cta(200px,100px,$float-offset-y - 220px,$float-offset-x - 120px);
+    }
+
+    #overlay-float{
+      @include overlay($float-width, $float-height);
+    }
+
+    #bg-float{
+      @include graphic($float-width, $float-height);
+      @include banner-img("images/float-bg.jpg");
+      @include opacity(1);
+      z-index: 2;
+    }
+  }
+}
+

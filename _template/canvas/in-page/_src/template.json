@@ -7,7 +7,5 @@
   "offset-x":_OFFSET-X_,
   "offset-y":_OFFSET-Y_,
   "lang":"_LANG_",
-  "pub":"_PUB_",
-  "type":"_TYPE_",
-  "quality":65
+  "type":"_TYPE_"
 }
