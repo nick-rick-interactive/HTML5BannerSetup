@@ -4,8 +4,11 @@
 /// _PREFIX___WIDTH_x_HEIGHT_
 
 
-$width:   _WIDTH_px;
-$height:  _HEIGHT_px;
+$width:   0px;
+$height:  0px;
+
+//Gulp Injects the correct Height and Width below.
+//w_h_inject
 
 *{
   margin: 0;
@@ -13,25 +16,43 @@ $height:  _HEIGHT_px;
   outline: none;
 }
 
+
+img{
+  image-rendering: -moz-crisp-edges;         /* Firefox */
+  image-rendering:   -o-crisp-edges;         /* Opera */
+  image-rendering: -webkit-optimize-contrast;/* Webkit (non-standard naming) */
+  image-rendering: auto;
+  -ms-interpolation-mode: nearest-neighbor;
+}
+
 body{
-  background: gray;
+  background: black;
 }
 
 #main{
   @include container($width, $height);
+}
 
-  #cta{
-    @include cta(200px,100px,$width - 220px,$height - 120px);
+#elements{
+  display: none;
+
+  #ctacont{
+    @include cta(auto, auto);
+
   }
 
   #overlay{
     @include overlay($width, $height);
   }
 
+  #cta{
+    @include graphic-img(0,0);
+    opacity: 0;
+  }
+
   #bg{
-    @include graphic($width, $height);
-    @include opacity(1);
-    z-index: 2;
+    @include graphic-img(0,0);
+    opacity: 1;
   }
 }
 

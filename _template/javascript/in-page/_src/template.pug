@@ -1,0 +1,38 @@
+doctype html
+
+html(lang='en')
+
+    head
+
+        meta(charset='UTF-8')
+
+        title=config.prefix + " - " + config.width + "x" + config.height
+
+        link(href = config.prefix + "_" + config.width + "x" + config.height + ".min.css", rel = 'stylesheet')/
+
+        // TODO - AND THE LANGUAGE AND PUB JS LOGIC FROM THE CONFIG
+
+        if config.pub.indexOf('simplifi')>0
+            if config.lang=="canvas"
+                each i in info.js_includes.publisher.simplifi_canvas
+                    script(src=i)
+            else
+                each i in info.js_includes.publisher[config.pub]
+                    script(src=i)
+        else
+            each i in info.js_includes.publisher[config.pub]
+                script(src=i)
+
+        script
+            | var clickTag = "";
+            | var banner = "";
+
+    body
+
+        #main
+
+            a#cta(href='javascript:banner.exit()')
+            a#overlay(href='javascript:banner.exit()')
+            #bg
+
+        script(src=config.prefix + "_" + config.width + "x" + config.height + ".min.js")
