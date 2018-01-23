@@ -1,0 +1,118 @@
+@import "../../_src/sass/banner.scss";
+
+
+/// Chrome_300x250
+
+$width:0;
+$height:0;
+
+//w_h_inject
+
+*{
+  margin: 0;
+  padding: 0;
+  outline: none;
+}
+
+img{
+  image-rendering: -moz-crisp-edges;         /* Firefox */
+  image-rendering:   -o-crisp-edges;         /* Opera */
+  image-rendering: -webkit-optimize-contrast;/* Webkit (non-standard naming) */
+  image-rendering: auto;
+  -ms-interpolation-mode: nearest-neighbor;
+}
+
+body{
+  background: white;
+}
+
+#main{
+  opacity: 1;
+  z-index: 2;
+  transform-origin: 50% 50%;
+  position: relative;
+  display: inline-block;
+}
+#main-container{
+  position: relative;
+  display: inline-block;
+  opacity: 1;
+  z-index: 2;
+  background: url('../_img/bg.jpg');
+  @include container($width, $height);
+}
+
+#elements{
+  display: none;
+
+  #bg_over{
+    @include graphic-img(0,0);
+    opacity: 0;
+    z-index: 2;
+  }
+
+  #cta{
+    @include graphic-img(0,0);
+    opacity: 0;
+  }
+
+  #cta_overlay{
+    @include graphic-img(0,0);
+    opacity: 0;
+  }
+
+  #overlay{
+    @include overlay($width, $height);
+    z-index: 80;
+  }
+
+  #chevron{
+    @include graphic-img(0,0);
+    opacity: 0;
+  }
+
+  #headline{
+    @include graphic-img(0,0);
+    opacity: 1;
+  }
+
+  @for $i from 1 through 6{
+    #h#{$i}{
+      @include graphic-img(0,0);
+      opacity: 0;
+    }
+  }
+
+  #headline2{
+    @include graphic-img(0,0);
+    opacity: 1;
+  }
+
+  @for $i from 1 through 6{
+    #h2_#{$i}{
+      @include graphic-img(0,0);
+      opacity: 0;
+    }
+  }
+
+  #ball{
+    @include graphic-img(0,0);
+    opacity: 0;
+  }
+
+  #bg{
+    @include graphic-img(0,0);
+    opacity: 1;
+    z-index: 2;
+  }
+
+}
+.bg-container{
+  position: absolute;
+  display: inline-block;
+  overflow: hidden;
+  top:0;
+  left:0;
+  width: $width;
+  height:$height;
+}

@@ -51,3 +51,7 @@
 .ani-elem{
   @include opacity(0);
 }
+
+#main{
+  cursor: pointer;
+}

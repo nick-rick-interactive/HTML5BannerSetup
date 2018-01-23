@@ -1,0 +1,95 @@
+doctype html
+
+html(lang='en')
+
+    head
+
+        meta(charset='UTF-8')
+        meta(name="viewport" content="width = 1260, initial-scale=1.0")
+
+        title=config.prefix
+
+        link(href="https://fonts.googleapis.com/css?family=Raleway:400,700,300" rel="stylesheet" type="text/css")
+        link(href="https://cdnjs.cloudflare.com/ajax/libs/normalize/3.0.3/normalize.min.css" rel="stylesheet" type="text/css")
+        link(href="view.css" rel="stylesheet" type="text/css")
+
+    body
+
+
+
+
+        .tr-lock
+            img(src="http://www.nickrickinteractive.com/img/tr_lock.png")
+        .bl-lock
+            img(src="http://www.nickrickinteractive.com/img/bl_lock.png")
+        .site
+            .logo
+                img(src="http://www.nickrickinteractive.com/img/logo.png")
+
+            h1
+                span=config.prefix+" Review"
+                a.lights(href="#")
+                    svg(xmlns='http://www.w3.org/2000/svg', width='24', height='24', viewbox='0 0 24 24')
+                        path.light-bulb(d='M19 6.734c0 4.164-3.75 6.98-3.75 10.266h-6.5c0-3.286-3.75-6.103-3.75-10.266 0-4.343 3.498-6.734 6.996-6.734 3.502 0 7.004 2.394 7.004 6.734zm-4.5 11.266h-5c-.276 0-.5.224-.5.5s.224.5.5.5h5c.276 0 .5-.224.5-.5s-.224-.5-.5-.5zm0 2h-5c-.276 0-.5.224-.5.5s.224.5.5.5h5c.276 0 .5-.224.5-.5s-.224-.5-.5-.5zm.25 2h-5.5l1.451 1.659c.19.216.465.341.753.341h1.093c.288 0 .562-.125.752-.341l1.451-1.659z')
+
+            .units
+                each unit in config.units
+                    .unit-block(data-unit=unit.filename,data-width=unit.width,data-height=unit.height)
+                        a(name=unit.filename)
+                        .unit-title
+                            strong=unit.filename
+                            a(href="#"+unit.filename).expand
+                                img(src="icons/enlarge2.svg")
+                            a(href="#"+unit.filename).reload
+                                img(src="icons/loop2.svg")
+                            a(href=unit.filename+"/index.html",target="_blank").new-tab
+                                img(src="icons/new-tab.svg")
+                        .unit-frame
+                            iframe(src="",frameBorder="0",scrolling="no")
+
+        script(src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js")
+        script(src="https://s0.2mdn.net/ads/studio/cached_libs/tweenmax_1.18.0_499ba64a23378545748ff12d372e59e9_min.js")
+
+        script.
+            $(function () {
+              $("a.lights").on("click",toggleLights);
+              $(".unit-block").each(function (i,e){
+                $(e).find(".expand").on("click",toggleExpand)
+                $(e).find(".reload").on("click",reloadUnit)
+                $(e).find("iframe")
+                var frame = $(e).find("iframe");
+                frame.css({width:$(e).data("width")+"px",height:$(e).data("height")+"px"})
+              });
+
+            })
+            function toggleExpand(e){
+                e.preventDefault()
+                var unit = $(e.currentTarget).parent().parent();
+                if($(unit).hasClass("open")){
+                  $(unit).removeClass("open")
+                  $(unit).find(".expand img").attr("src", "icons/enlarge2.svg")
+                    TweenMax.to($(unit).find(".unit-frame"),0.3,{height:"0px",onComplete:function(){
+                        $(unit).find("iframe").attr("src","")
+                    }})
+                }else{
+                  $(unit).addClass("open")
+                  $(unit).find(".expand img").attr("src", "icons/shrink2.svg")
+                  $(unit).find("iframe").attr("src", $(unit).data("unit"))
+                    TweenMax.to($(unit).find(".unit-frame"), 0.3, {height: unit.data("height") + "px"})
+                }
+            }
+            function reloadUnit(e){
+                e.preventDefault()
+                var unit = $(e.currentTarget).parent().parent();
+                var src = unit.find("iframe").attr("src");
+                unit.find("iframe").attr("src", "");
+                unit.find("iframe").attr("src", src);
+            }
+            function toggleLights(e){
+                e.preventDefault()
+              if($(".site").hasClass("on")){
+                  $(".site").removeClass("on")
+              }else{
+                $(".site").addClass("on")
+              }
+            }

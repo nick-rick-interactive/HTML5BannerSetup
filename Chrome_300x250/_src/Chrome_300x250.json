@@ -1,0 +1,12 @@
+{
+  "prefix":"Chrome",
+  "width":300,
+  "height":250,
+  "exp_width":300,
+  "exp_height":250,
+  "offset-x":0,
+  "offset-y":0,
+  "lang":"canvas",
+  "type":"in-page",
+  "quality":85
+}

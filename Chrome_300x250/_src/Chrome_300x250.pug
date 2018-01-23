@@ -1,0 +1,52 @@
+doctype html
+
+html(lang='en')
+
+    head
+
+        meta(charset='UTF-8')
+
+        title=config.prefix + " - " + config.width + "x" + config.height
+
+        link(href = config.prefix + "_" + config.width + "x" + config.height + ".min.css", rel = 'stylesheet')/
+
+        if info.js_includes.overwrite
+            each i in info.js_includes.overwrite
+                script(src=i)
+        else
+            each i in info.js_includes.standard
+                script(src=i)
+
+        script
+            | var clickTag = "[UNENCODED_CLICK_REDIRECT]__CLICK_URL | uri_preserve_square_brackets__";
+
+    body
+
+        #main-container()
+            canvas#main(width=config.width,height=config.height)
+
+        #elements
+
+            #ctacont(data-type="container")
+
+                #overlay(data-type="rectangle")
+
+            //img#logo(data-type='ani-elem' src="images/logo.png")
+
+            #headline(data-type='container')
+                each val in [1,2,3]
+                    img(id="h"+val src="images/headline_"+val+".png", data-type="ani-elem")
+
+            #headline2(data-type='container')
+                each val in [1,2]
+                    img(id="h2_"+val src="images/headline_2_"+val+".png", data-type="ani-elem")
+
+            img#chevron(src="images/chevron.png", data-type="ani-elem")
+            img#cta(src="images/cta.png", data-type="ani-elem")
+
+            img#ball(src="images/ball.png", data-type="ani-elem")
+
+            img#bg(src="images/bg.jpg", data-type="ani-elem")
+
+        script(src=config.prefix + "_" + config.width + "x" + config.height + ".min.js")
+

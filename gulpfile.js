@@ -24,15 +24,30 @@ var tap = require('gulp-tap');
 // COMPILING
 var plumber   = require( 'gulp-plumber' );
 var beep      = require( 'beepbeep' );
-var jade = require('gulp-jade');
-var coffee = require('gulp-coffee');
+var pug = require('gulp-pug');
+//var coffee = require('gulp-coffee');
+var ts = require('gulp-typescript');
 var sass = require('gulp-sass');
-//var compass = require('gulp-compass');
+
+// PostCSS
+var postcss = require("gulp-postcss");
 var nano = require('gulp-cssnano');
-var prefix = require('gulp-autoprefixer');
+var prefix = require('autoprefixer');
+var debug = require('gulp-debug')
+var plugs = [
+  prefix({
+    browsers: ['last 2 versions'],
+    cascade: false
+  }),
+  require('cssgrace')
+]
+
+// Image
 var imagemin = require('gulp-imagemin');
-var imageMinJpegTran = require('imagemin-jpegtran');
 var imageMinPngQuant = require('imagemin-pngquant');
+var recompress = require('imagemin-jpeg-recompress');
+
+var clean = require('gulp-clean');
 
 //Plumber Hanlder
 var onError = function (err) {
@@ -73,15 +88,20 @@ var excludeGitignore = require('gulp-exclude-gitignore');
 // ---------------------------------------------------------------------
 
 var directories;
+var pkgConfig;
 var taskCount;
 var src = {
-    jade: dirs.src+'/'+filename+'.jade',
+    pug: dirs.src+'/'+filename+'.pug',
     coffee: dirs.src + '/'+filename+'.coffee',
+    ts: dirs.src + '/'+filename+'.ts',
     sass: dirs.src + '/'+filename+'.scss',
     config: dirs.src + '/'+filename+'.json',
-    img: filename + "/_img/**"
+    img: filename + '/_img/*'
 }
 var config;
+var varInjection;
+var proxyPrefix = "http://localhost:80/TTC/";
+//var proxyPrefix = "http://localhost:8888/tests/TTC/Callaway/"
 
 
 // ---------------------------------------------------------------------
@@ -89,7 +109,7 @@ var config;
 // ---------------------------------------------------------------------
 
 gulp.task('clean', function (done) {
-    del([
+    return del([
         dirs.dist
     ], done);
 });
@@ -99,58 +119,71 @@ gulp.task('copy', [
 ]);
 
 gulp.task('copy:images', function () {
+    var qual = (config.quality) ? config.quality : 60;
     return gulp.src(src.img)
+      .pipe(debug())
         .pipe(imagemin({
             progressive: true,
             use: [
-                imageMinJpegTran({progessive: true}),
-                imageMinPngQuant({quality: '65-80', speed: 4})
-            ]
+                recompress({
+                    loops:3,
+                    min:qual,
+                    max:qual
+                }),
+                imageMinPngQuant({quality: qual+'-'+qual, speed: 4})
+            ],
+            verbose:true
         }))
-        .pipe(gulp.dest(dirs.dist + ""))
+        .pipe(gulp.dest(dirs.dist))
+      //.pipe(debug())
         .pipe(reload({stream: true}));
 });
 
-gulp.task('jade', function () {
-    var YOUR_LOCALS = {
-        size: filename
-    };
+gulp.task('pug', function () {
     var img1 = new RegExp("images/","g");
     var img2 = new RegExp("_img/","g");
 
-    return gulp.src(src.jade)
+    return gulp.src(src.pug)
         .pipe(plumber({
             errorHandler: onError
         }))
-        .pipe(jade({locals: YOUR_LOCALS,pretty:true}))
+        .pipe(pug({locals: varInjection,pretty:true}))
         .pipe(replace({
             patterns: [
                 {match: img1,replacement: ""},
                 {match: img2,replacement: ""}
             ]
         }))
-        .pipe(rename(filename+'.html'))
+        .pipe(rename('index.html'))
         .pipe(gulp.dest(dirs.dist))
         .pipe(reload({stream: true}));
 });
 
-gulp.task('coffee', function () {
+gulp.task('ts', function () {
+    var tsProject = ts.createProject('tsconfig.json');
     config = require("./"+src.config);
+    varInjection = {
+        config: config,
+        info: pkg,
+        size: filename
+    };
     var bannerClass;
     if(config['type']=="adwords"){
         bannerClass = (config['lang']=="js") ? "banner_aw" : "banner_aw_canvas";
     }else{
         bannerClass = (config['lang']=="js") ? "banner" : "banner_canvas";
+        bannerClass = (config['lang']=="canvas_sf") ? "banner_canvas_sf" : bannerClass;
     }
-    return gulp.src([
-            "_src/coffee/"+bannerClass+".coffee",
-            src.coffee
-        ])
+    var tsResult = gulp.src([
+        "_src/ts/"+bannerClass+".ts",
+        src.ts
+    ])
         .pipe(plumber({
             errorHandler: onError
         }))
-        .pipe(concat("concat.coffee"))
-        .pipe(coffee({bare: true}))
+        .pipe(concat("concat.ts"))
+        .pipe(tsProject())
+    return tsResult.js
         .pipe(rename(filename+'.js'))
         .pipe(gulp.dest(dirs.dist))
         .pipe(plugins.uglify({ mangle:true }))
@@ -162,22 +195,20 @@ gulp.task('coffee', function () {
 gulp.task('sass', function () {
     var img1 = new RegExp("images/","g");
     var img2 = new RegExp("_img/","g");
+    var inject = new RegExp("//w_h_inject","g");
     return gulp.src(src.sass)
         .pipe(plumber({
             errorHandler: onError
         }))
+        .pipe(replace({
+            patterns: [
+                {match: inject,replacement: "$width:"+config.width+"px; $height:"+config.height+"px; $prefix:"+config.prefix+";"}
+            ]
+        }))
         .pipe(sass({
             errLogToConsole: true
         }).on('error', sass.logError))
-        /*.pipe(compass({
-         css: dirs.dist,
-         sass: dirs.dist,
-         image: dirs.dist+'/images'
-         })*/
-        .pipe(prefix({
-            browsers: ['last 2 versions'],
-            cascade: false
-        }))
+        .pipe(postcss(plugs))
         .pipe(replace({
             patterns: [
                 {match: img1,replacement: ""},
@@ -194,34 +225,38 @@ gulp.task('sass', function () {
 
 gulp.task('zip', function () {
     return gulp.src([
-            dirs.dist + "/**/*",
-            '!' + dirs.dist + "/" + filename + ".zip",
-            '!' + dirs.dist + "/" + filename + ".js",
-            '!' + dirs.dist + "/" + filename + ".css"
-        ])
+        dirs.dist + "/**/*",
+        '!' + dirs.dist + "/" + filename + ".zip",
+        '!' + dirs.dist + "/" + filename + ".js",
+        '!' + dirs.dist + "/" + filename + ".css"
+    ])
         .pipe(zip(filename+'.zip'))
         .pipe(gulp.dest(dirs.dist))
         .pipe(gulp.dest("zipped"))
 });
 
+gulp.task('includes', function () {
+    return gulp.src('./includes/*.js')
+        .pipe(gulp.dest(dirs.dist))
+});
+
 gulp.task('serve', function () {
 
-    console.log(path.basename(path.dirname()));
     browserSync.init({
-        proxy: 'http://localhost:63342/'+path.basename(__dirname)+'/'+dirs.dist+'/'+filename+'.html'
+        proxy: proxyPrefix+path.basename(__dirname)+'/'+dirs.dist+'/index.html'
     });
 
-    gulp.watch("./_src/coffee/**", ['coffee']);
-    gulp.watch(src.coffee, ['coffee']);
+    gulp.watch("./_src/ts/**", ['ts']);
+    gulp.watch(src.ts, ['ts']);
     gulp.watch(src.sass, ['sass']);
     gulp.watch(src.img, ['copy:images']);
-    gulp.watch(src.jade, ['jade']);
+    gulp.watch(src.pug, ['pug']);
 
     gulp.watch([
-        src.coffee,
+        src.ts,
         src.sass,
         src.img,
-        src.jade
+        src.pug
     ], ['zip'])
 
 });
@@ -242,10 +277,11 @@ gulp.task('build', function (done) {
 
     runSequence(
         'clean',
-        'coffee',
+        'ts',
         'sass',
         'copy',
-        'jade',
+        'pug',
+        'includes',
         'zip',
         'serve',
         done);
@@ -267,51 +303,119 @@ gulp.task('package', function () {
 
     taskCount = 0;
     directories = [];
+    pkgConfig = {}
+    pkgConfig.config = {};
+    pkgConfig.config.prefix = argv.prefix;
+    pkgConfig.config.units = [];
 
     function runTasks(){
         taskCount++;
         if(taskCount!=directories.length+1){
 
             filename = directories[taskCount-1];
-            console.log("Packaging "+directories[taskCount-1]);
 
             dirs.src = filename + "/_src";
             dirs.dist = filename + "/dist";
 
             src = {
-                jade: dirs.src+'/'+filename+'.jade',
-                coffee: dirs.src + '/'+filename+'.coffee',
+                pug: dirs.src+'/'+filename+'.pug',
+                ts: dirs.src + '/'+filename+'.ts',
                 sass: dirs.src + '/'+filename+'.scss',
-                img: filename + "/_img/**"
+                img: filename + "/_img/**",
+                config: dirs.src + '/'+filename+'.json'
             }
 
+            config = require("./"+src.config);
+            varInjection = {
+                config: config,
+                info: pkg,
+                size: filename
+            };
 
-            runSequence(
-                'clean',
-                'coffee',
-                'sass',
-                'copy',
-                'jade',
+
+            if(argv.view){
+              runSequence(
+                'copyToViewer',
                 'zip',
                 runTasks);
+            }else{
+              runSequence(
+                'clean',
+                'ts',
+                'sass',
+                'copy',
+                'pug',
+                'copyToViewer',
+                //'includes',
+                'zip',
+                runTasks);
+            }
         }else{
             runSequence(
-                'zipAll'
+                'makeViewer',
+                'zipAll',
+                'servePackageView'
             )
         }
     }
 
     runSequence(
+        'cleanPackage',
         'getDirectories',
+        'eraseZips',
         runTasks
     )
 });
 
+
+gulp.task('cleanPackage', function (done) {
+  return del([
+    "./"+argv.prefix+"/"
+  ], done);
+});
 gulp.task('getDirectories',function(){
-    return gulp.src(argv.prefix+"_*")
+    return gulp.src([argv.prefix+"_*","!"+argv.prefix+"_*.zip"])
         .pipe(tap(function(file,t){
-            directories.push(path.basename((file.path)))
+            var basename = path.basename((file.path));
+
+            var sizes = basename.substr(String(argv.prefix+"_").length,basename.length).split("x");
+
+            var unit = {};
+            unit.filename = basename;
+            unit.width = sizes[0];
+            unit.height = sizes[1];
+            pkgConfig.config.units.push(unit);
+
+            directories.push(basename)
         }));
+})
+
+gulp.task('eraseZips',function(){
+    return gulp.src("./zipped")
+        .pipe(clean())
+})
+
+gulp.task('copyToViewer',function(){
+    gulp.src(dirs.dist+"/*")
+        .pipe(gulp.dest("./"+argv.prefix+"/"+filename+"/"))
+})
+
+gulp.task('makeViewer',function(){
+    console.log('making viewer');
+    gulp.src(["./_src/packaging/viewing-template.scss"])
+      .pipe(sass({
+        errLogToConsole: true
+      }).on('error', sass.logError))
+      .pipe(postcss(plugs))
+      .pipe(nano())
+      .pipe(rename("view.css"))
+      .pipe(gulp.dest("./"+argv.prefix+"/"))
+    gulp.src(["./_src/packaging/viewing-template.pug"])
+        .pipe(pug({locals: pkgConfig,pretty:true}))
+        .pipe(rename('index.html'))
+        .pipe(gulp.dest("./"+argv.prefix+"/"))
+    return gulp.src(["./_src/packaging/icons/*"])
+        .pipe(gulp.dest("./"+argv.prefix+"/icons/"))
 })
 
 gulp.task('zipAll',function(){
@@ -320,6 +424,14 @@ gulp.task('zipAll',function(){
         .pipe(zip("./"+argv.prefix+'.zip'))
         .pipe(gulp.dest("./"))
 })
+
+gulp.task('servePackageView', function () {
+
+  browserSync.init({
+    proxy: proxyPrefix+path.basename(__dirname)+'/'+argv.prefix+'/index.html'
+  });
+
+});
 
 
 // COPY BANNER
@@ -353,6 +465,7 @@ gulp.task('copy-banner', function (done) {
     runSequence(
         "cb-move-files",
         "cb-rename",
+        "cb-json",
         "cb-remove-temp",
         done);
 });
@@ -374,33 +487,46 @@ gulp.task('cb-move-files', function () {
     newFilename = (bannerType=="in-page") ?  newVals[0]+"_"+newVals[1]+"x"+newVals[2] : newVals[0]+"_"+newVals[1]+"x"+newVals[2]+"_exp_"+newVals[3]+"x"+newVals[4];
 
     return gulp.src([
-            filename + "/**/*",
-            "!" + filename + "/dist/**/*"
-        ])
+        filename + "/**/*",
+        "!" + filename + "/dist/**/*"
+    ])
         .pipe(gulp.dest(newFilename))
 });
 
 gulp.task('cb-rename', function () {
-    var reW = new RegExp(vals[1],"g");
-    var reH = new RegExp(vals[2],"g");
     var re = new RegExp(filename,"g");
-    gulp.src(newFilename+"/_src/"+newFilename+".json")
+    var reX = new RegExp(vals[1]+"x"+vals[2],"g");
+    var reC = new RegExp(vals[1]+", "+vals[2],"g");
+    return gulp.src([newFilename+"/_src/**/*"])
         .pipe(replace({
             patterns: [
-                {match: reW,replacement: newVals[1]},
-                {match: reH,replacement: vals[2]}
-            ]
-        }));
-    return gulp.src(newFilename+"/_src/**/*")
-        .pipe(replace({
-            patterns: [
-                {match: re,replacement: newFilename}
+                {match: re,replacement: newFilename},
+                {match: reX,replacement: newVals[1]+"x"+newVals[2]},
+                {match: reC,replacement: newVals[1]+", "+newVals[2]}
             ]
         }))
         .pipe(rename(function(path){
             path.basename = newFilename
         }))
-        .pipe(gulp.dest(newFilename+"/_src/"))
+        .pipe(gulp.dest(newFilename+"/_src/"));
+});
+
+gulp.task('cb-json', function () {
+    var reP = new RegExp(vals[0],"g");
+    var reW = new RegExp(vals[1],"g");
+    var reH = new RegExp(vals[2],"g");
+    return gulp.src(newFilename+"/_src/*.json")
+        .pipe(replace({
+            patterns: [
+                {match: reP,replacement: newVals[0]},
+                {match: reW,replacement: newVals[1]},
+                {match: reH,replacement: newVals[2]}
+            ]
+        }))
+        .pipe(rename(function(path){
+            path.basename = newFilename
+        }))
+        .pipe(gulp.dest(newFilename+"/_src/"));
 });
 
 gulp.task('cb-remove-temp', function () {

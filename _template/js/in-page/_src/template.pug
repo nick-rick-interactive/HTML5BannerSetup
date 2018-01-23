@@ -1,0 +1,32 @@
+doctype html
+
+html(lang='en')
+
+    head
+
+        meta(charset='UTF-8')
+
+        title=config.prefix + " - " + config.width + "x" + config.height
+
+        link(href = config.prefix + "_" + config.width + "x" + config.height + ".min.css", rel = 'stylesheet')/
+
+        if info.js_includes.overwrite
+            each i in info.js_includes.overwrite
+                script(src=i)
+        else
+            each i in info.js_includes.standard
+                script(src=i)
+
+        script
+            | var clickTag = "";
+            | var banner = "";
+
+    body
+
+        #main
+
+            a#cta(href='javascript:ExitApi.exit()')
+            a#overlay(href='javascript:ExitApi.exit()')
+            #bg
+
+        script(src=config.prefix + "_" + config.width + "x" + config.height + ".min.js")
